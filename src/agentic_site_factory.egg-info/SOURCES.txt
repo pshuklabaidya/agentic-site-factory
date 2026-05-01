@@ -8,6 +8,7 @@ src/agentic_site_factory/bundle.py
 src/agentic_site_factory/ingestion.py
 src/agentic_site_factory/models.py
 src/agentic_site_factory/pipeline.py
+src/agentic_site_factory/preview_links.py
 src/agentic_site_factory/quality.py
 src/agentic_site_factory/retrieval.py
 src/agentic_site_factory/settings.py
@@ -24,6 +25,7 @@ tests/test_bundle.py
 tests/test_generate_from_spec.py
 tests/test_ingestion.py
 tests/test_pipeline.py
+tests/test_preview_links.py
 tests/test_quality.py
 tests/test_retrieval.py
 tests/test_settings.py
