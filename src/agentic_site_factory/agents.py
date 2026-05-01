@@ -1,15 +1,19 @@
 from __future__ import annotations
 
-import os
 from textwrap import shorten
 
 from openai import OpenAI, OpenAIError
 
 from agentic_site_factory.models import GeneratedSection, RetrievedPassage, SitePlan, SiteSpec
+from agentic_site_factory.settings import load_openai_settings
 
 
 def openai_available() -> bool:
-    return bool(os.getenv("OPENAI_API_KEY"))
+    return load_openai_settings().enabled
+
+
+def openai_model_name() -> str:
+    return load_openai_settings().model
 
 
 def plan_site(spec: SiteSpec, passages: list[RetrievedPassage]) -> SitePlan:
@@ -123,26 +127,28 @@ def generate_section_with_openai(
     spec: SiteSpec,
     passages: list[RetrievedPassage],
 ) -> GeneratedSection:
-    if not openai_available():
+    settings = load_openai_settings()
+
+    if not settings.enabled:
         return generate_section_deterministic(section_name, spec, passages)
 
-    model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-    client = OpenAI()
     evidence = "\n\n".join(
         f"Source: {passage.source}\nPassage: {passage.text}" for passage in passages[:5]
     )
 
     prompt = f"""
-Create concise website copy for one section of an author website.
+Create concise website copy for one section of an author or creator website.
 
-Author: {spec.author_name}
+Author or brand: {spec.author_name}
 Audience: {spec.audience}
 Tone: {spec.tone}
 Website goal: {spec.website_goal}
+Optional style guidance: {spec.style_guidance}
 Section: {section_name}
 
 Use only the supplied evidence for concrete claims.
 Keep the body under 120 words.
+Do not invent titles, biography facts, awards, prices, dates, publishers, or purchase links.
 
 Evidence:
 {evidence}
@@ -153,18 +159,18 @@ Body: <body>
 """.strip()
 
     try:
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
+        client = OpenAI(api_key=settings.api_key, timeout=20.0, max_retries=0)
+        response = client.responses.create(
+            model=settings.model,
+            input=[
                 {
                     "role": "system",
-                    "content": "You write grounded website copy from supplied evidence.",
+                    "content": "Write grounded website copy from supplied evidence.",
                 },
                 {"role": "user", "content": prompt},
             ],
-            temperature=0.4,
         )
-        text = response.choices[0].message.content or ""
+        text = response.output_text.strip()
     except OpenAIError:
         return generate_section_deterministic(section_name, spec, passages)
 

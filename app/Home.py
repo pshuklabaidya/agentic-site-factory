@@ -5,7 +5,7 @@ from pathlib import Path
 import streamlit as st
 import streamlit.components.v1 as components
 
-from agentic_site_factory.agents import openai_available, plan_site
+from agentic_site_factory.agents import openai_available, openai_model_name, plan_site
 from agentic_site_factory.bundle import create_zip_archive
 from agentic_site_factory.ingestion import extract_uploaded_document, load_local_text_documents
 from agentic_site_factory.models import SiteSpec, SourceDocument
@@ -109,6 +109,7 @@ with left:
         st.write(preview_plan.content_strategy)
         generation_mode = "OpenAI API" if openai_available() else "Deterministic local fallback"
         st.write(f"**Generation mode:** {generation_mode}")
+        st.write(f"**OpenAI model:** {openai_model_name()}")
         st.write("**Agent workflow:**")
 
         for step in preview_plan.agent_steps:

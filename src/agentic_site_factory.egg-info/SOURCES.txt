@@ -10,6 +10,7 @@ src/agentic_site_factory/models.py
 src/agentic_site_factory/pipeline.py
 src/agentic_site_factory/quality.py
 src/agentic_site_factory/retrieval.py
+src/agentic_site_factory/settings.py
 src/agentic_site_factory/site_builder.py
 src/agentic_site_factory/spec_generation.py
 src/agentic_site_factory/theming.py
@@ -25,6 +26,7 @@ tests/test_ingestion.py
 tests/test_pipeline.py
 tests/test_quality.py
 tests/test_retrieval.py
+tests/test_settings.py
 tests/test_site_builder.py
 tests/test_template.py
 tests/test_themes.py

@@ -45,7 +45,7 @@ This is useful for quick verification without launching the dashboard.
 Set environment variables before launching the app.
 
     export OPENAI_API_KEY="your-key-here"
-    export OPENAI_MODEL="gpt-4o-mini"
+    export OPENAI_MODEL="gpt-5-mini"
 
 Without an API key, the deterministic local fallback remains fully functional.
 
@@ -60,3 +60,11 @@ Without an API key, the deterministic local fallback remains fully functional.
 
 
 - The generated artifact bundle includes theme_spec.json with the inferred visual style rationale and CSS values.
+
+
+- OpenAI configuration supports environment variables, local .env files, and Streamlit secrets.
+
+## OpenAI Runtime Behavior
+
+The Streamlit app uses OpenAI generation when `OPENAI_API_KEY` is available. Repository validation commands use deterministic local generation by setting `AGENTIC_SITE_FACTORY_DISABLE_OPENAI=1`, so tests and CLI demos stay fast and do not spend API credits.
+

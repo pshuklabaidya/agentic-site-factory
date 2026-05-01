@@ -27,7 +27,7 @@ Recommended settings:
 Optional secrets:
 
     OPENAI_API_KEY="your-key-here"
-    OPENAI_MODEL="gpt-4o-mini"
+    OPENAI_MODEL="gpt-5-mini"
 
 The app runs without secrets through deterministic local fallback mode.
 
@@ -65,3 +65,11 @@ This prevents local uploads and generated files from being accidentally committe
 
 
 - The generated artifact bundle includes theme_spec.json with the inferred visual style rationale and CSS values.
+
+
+- OpenAI configuration supports environment variables, local .env files, and Streamlit secrets.
+
+## OpenAI Runtime Behavior
+
+The Streamlit app uses OpenAI generation when `OPENAI_API_KEY` is available. Repository validation commands use deterministic local generation by setting `AGENTIC_SITE_FACTORY_DISABLE_OPENAI=1`, so tests and CLI demos stay fast and do not spend API credits.
+
