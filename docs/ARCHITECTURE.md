@@ -174,3 +174,6 @@ Generate from JSON specification:
 
 
 - Generated sites are published to Streamlit static files and opened as real separate-tab pages.
+
+
+- Streamlit static serving is enabled so generated sites open as real separate-tab pages under `/app/static/...`.

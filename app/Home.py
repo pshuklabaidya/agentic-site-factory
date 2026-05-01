@@ -10,7 +10,7 @@ from agentic_site_factory.bundle import create_zip_archive
 from agentic_site_factory.ingestion import extract_uploaded_document, load_local_text_documents
 from agentic_site_factory.models import SiteSpec, SourceDocument
 from agentic_site_factory.pipeline import run_generation_pipeline
-from agentic_site_factory.static_publish import publish_static_site
+from agentic_site_factory.static_publish import create_static_site_link, publish_static_site
 from agentic_site_factory.retrieval import retrieve_passages
 from agentic_site_factory.theming import infer_custom_theme
 
@@ -149,6 +149,14 @@ with right:
 
         if result.manifest is not None:
             st.write(f"**Artifact files:** {', '.join(result.manifest.files)}")
+
+        static_dir, site_url = publish_static_site(
+            source_dir=output_dir,
+            static_root=ROOT / "app" / "static",
+            site_name=spec.author_name,
+        )
+        st.markdown(create_static_site_link(site_url), unsafe_allow_html=True)
+        st.write(f"**Static preview path:** {static_dir}")
 
         static_dir, site_url = publish_static_site(
             source_dir=output_dir,

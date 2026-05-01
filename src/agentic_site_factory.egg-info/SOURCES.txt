@@ -32,6 +32,7 @@ tests/test_retrieval.py
 tests/test_settings.py
 tests/test_site_builder.py
 tests/test_static_publish.py
+tests/test_streamlit_config.py
 tests/test_template.py
 tests/test_themes.py
 tests/test_theming.py

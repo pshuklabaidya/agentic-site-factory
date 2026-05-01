@@ -26,3 +26,15 @@ def publish_static_site(
     shutil.copytree(source_dir, destination)
 
     return destination, f"/app/static/generated_sites/{site_slug}/index.html"
+
+
+def create_static_site_link(
+    site_url: str,
+    label: str = "Open generated website in new tab",
+) -> str:
+    return (
+        f'<a href="{site_url}" target="_blank" rel="noopener noreferrer" '
+        'style="display:inline-block;padding:0.75rem 1rem;border-radius:999px;'
+        'background:#6d28d9;color:white;font-weight:700;text-decoration:none;">'
+        f"{label}</a>"
+    )

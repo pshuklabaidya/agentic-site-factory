@@ -27,6 +27,8 @@ The project demonstrates how an agentic workflow can transform source documents 
 
 ## Features
 
+- Streamlit static serving is enabled so generated sites open as real separate-tab pages under `/app/static/...`.
+
 - Generated sites are published to Streamlit static files and opened as real separate-tab pages.
 
 - OpenAI configuration supports environment variables, local .env files, and Streamlit secrets.
