@@ -53,7 +53,11 @@ def generated_site_viewer_url(site_slug: str, page_name: str = "index") -> str:
     return f"?generated_site={safe_slug}&page={safe_page}"
 
 
-def generated_site_page_path(static_root: Path, site_slug: str, page_name: str = "index") -> Path:
+def generated_site_page_path(
+    static_root: Path,
+    site_slug: str,
+    page_name: str = "index",
+) -> Path:
     safe_slug = slugify(site_slug)
     filename = page_filename_from_name(page_name)
     return static_root / "generated_sites" / safe_slug / filename
