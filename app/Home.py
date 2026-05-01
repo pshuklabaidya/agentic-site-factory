@@ -3,7 +3,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import streamlit as st
-import streamlit.components.v1 as components
 
 from agentic_site_factory.agents import openai_available, openai_model_name, plan_site
 from agentic_site_factory.bundle import create_zip_archive
@@ -28,6 +27,15 @@ st.set_page_config(
     page_icon=":building_construction:",
     layout="wide",
 )
+
+
+def render_generated_html(html: str) -> None:
+    try:
+        st.html(html, unsafe_allow_javascript=True)
+    except TypeError:
+        st.html(html)
+
+
 
 
 def get_query_param(name: str, default: str = "") -> str:
@@ -67,7 +75,7 @@ if generated_site_slug:
         )
         page_html = site_path.read_text(encoding="utf-8")
         page_html = rewrite_generated_site_links_for_viewer(page_html, generated_site_slug)
-        components.html(page_html, height=1200, scrolling=True)
+        render_generated_html(page_html)
     else:
         st.error("Generated site page not found. Return to the builder and generate the site again.")
 
@@ -229,6 +237,6 @@ with right:
             mime="application/zip",
         )
         preview_html = rewrite_generated_site_links_for_viewer(result.site.html, site_slug)
-        components.html(preview_html, height=760, scrolling=True)
+        render_generated_html(preview_html)
     else:
         st.write("Click Build Website to generate the static site.")

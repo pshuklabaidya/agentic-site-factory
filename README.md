@@ -27,6 +27,12 @@ The project demonstrates how an agentic workflow can transform source documents 
 
 ## Features
 
+- The demo cart uses browser localStorage so cart contents persist across generated pages and browser sessions.
+
+- Each detected book gets its own generated book page with an Add to Cart action.
+
+- The Books page lists uploaded documents classified as books, with brief summaries.
+
 - Generated websites are multi-page static artifacts with index.html plus one HTML file per generated section.
 
 - Streamlit static serving is enabled so generated sites open as real separate-tab pages under `/app/static/...`.

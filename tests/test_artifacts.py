@@ -13,7 +13,32 @@ def test_save_artifact_bundle_writes_expected_files(tmp_path):
         content_strategy="Use evidence.",
         agent_steps=["Plan", "Build"],
     )
-    html = "<!doctype html><header></header><main></main><script>addToCart(); cart-count</script></html>"
+    html = """
+    <!doctype html>
+    <html>
+      <head><title>Demo Site</title></head>
+      <body>
+        <main>
+          <section id="hero">
+            <div class="section-label">Hero Agent</div>
+            <h2>Hero</h2>
+            <p>Body</p>
+            <p class="source-note">Grounded in: source.txt</p>
+          </section>
+          <aside class="cart-panel">
+            <span id="cart-count">0</span>
+            <ul id="cart-items"></ul>
+          </aside>
+          <script>
+            function addBookToCart(book) {
+              const current = JSON.parse(localStorage.getItem("agenticSiteFactoryCart") || "[]");
+              localStorage.setItem("agenticSiteFactoryCart", JSON.stringify(current));
+            }
+          </script>
+        </main>
+      </body>
+    </html>
+    """
     site = GeneratedSite(
         title="Demo Site",
         html=html,

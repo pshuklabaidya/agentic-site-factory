@@ -1,10 +1,18 @@
 from __future__ import annotations
 
+import json
 import re
 from html import escape
 from pathlib import Path
 
-from agentic_site_factory.models import GeneratedSection, GeneratedSite, SiteSpec, ThemeSpec
+from agentic_site_factory.book_catalog import BookItem, build_book_catalog
+from agentic_site_factory.models import (
+    GeneratedSection,
+    GeneratedSite,
+    SiteSpec,
+    SourceDocument,
+    ThemeSpec,
+)
 from agentic_site_factory.text_sanitizer import sanitize_body, sanitize_heading
 from agentic_site_factory.theming import infer_custom_theme
 
@@ -31,10 +39,48 @@ def source_note(section: GeneratedSection) -> str:
     return f'<p class="source-note">Grounded in: {sources}</p>'
 
 
-def render_shop_section(section: GeneratedSection) -> str:
+def render_cart_box() -> str:
+    return """
+    <aside class="cart-panel" aria-label="Shopping cart">
+      <div>
+        <strong>Cart</strong>
+        <span id="cart-count">0</span> item(s)
+      </div>
+      <ul id="cart-items"></ul>
+      <button type="button" onclick="clearCart()">Clear Cart</button>
+    </aside>
+    """
+
+
+def render_shop_section(section: GeneratedSection, books: list[BookItem]) -> str:
     section_id = clean_section_id(section.name)
     heading = clean_heading(section.heading)
     body = sanitize_body(section.body)
+
+    if books:
+        cards = "\n".join(
+            f"""
+            <article class="book-card">
+              <div class="book-cover">{escape(book.title[:18])}</div>
+              <h3>{escape(book.title)}</h3>
+              <p>{escape(book.summary)}</p>
+              <a class="button-link" href="{escape(book.page_filename)}">View Book</a>
+              <button type="button" onclick='addBookToCart({json.dumps(book.model_dump())})'>
+                Add to Cart
+              </button>
+            </article>
+            """
+            for book in books
+        )
+    else:
+        cards = """
+        <article class="book-card">
+          <div class="book-cover">Book</div>
+          <h3>Featured Title</h3>
+          <p>Upload book-like documents to generate catalog products.</p>
+          <button type="button" onclick="addDemoCartItem()">Add Demo Item</button>
+        </article>
+        """
 
     return f"""
     <section id="{escape(section_id)}" class="section">
@@ -43,30 +89,58 @@ def render_shop_section(section: GeneratedSection) -> str:
       <p>{escape(body)}</p>
       {source_note(section)}
       <div class="shop-grid">
-        <article class="book-card">
-          <div class="book-cover">Book</div>
-          <h3>Featured Title</h3>
-          <p>Grounded description generated from supplied manuscript material.</p>
-          <button onclick="addToCart('Featured Title')">Add to Cart</button>
-        </article>
-        <article class="book-card">
-          <div class="book-cover">Next</div>
-          <h3>Upcoming Release</h3>
-          <p>Placeholder card for future catalog expansion.</p>
-          <button onclick="addToCart('Upcoming Release')">Join Waitlist</button>
-        </article>
+        {cards}
       </div>
-      <div class="cart-box">
-        <strong>Demo cart:</strong>
-        <span id="cart-count">0</span> selected item(s)
+      {render_cart_box()}
+    </section>
+    """
+
+
+def render_books_section(section: GeneratedSection, books: list[BookItem]) -> str:
+    section_id = clean_section_id(section.name)
+    heading = clean_heading(section.heading)
+    body = sanitize_body(section.body)
+
+    if books:
+        cards = "\n".join(
+            f"""
+            <a class="page-card" href="{escape(book.page_filename)}">
+              <span>Book</span>
+              <strong>{escape(book.title)}</strong>
+              <small>{escape(book.summary)}</small>
+            </a>
+            """
+            for book in books
+        )
+    else:
+        cards = """
+        <div class="empty-state">
+          <strong>No book-like uploads detected.</strong>
+          <p>Upload manuscripts, novels, memoirs, stories, chapters, essays, or other book-like documents to populate this page.</p>
+        </div>
+        """
+
+    return f"""
+    <section id="{escape(section_id)}" class="section">
+      <div class="section-label">Book Catalog</div>
+      <h2>{escape(heading)}</h2>
+      <p>{escape(body)}</p>
+      {source_note(section)}
+      <div class="page-grid">
+        {cards}
       </div>
     </section>
     """
 
 
-def render_section(section: GeneratedSection) -> str:
+def render_section(section: GeneratedSection, books: list[BookItem] | None = None) -> str:
+    resolved_books = books or []
+
     if section.name == "shop":
-        return render_shop_section(section)
+        return render_shop_section(section, resolved_books)
+
+    if section.name == "books":
+        return render_books_section(section, resolved_books)
 
     section_id = clean_section_id(section.name)
     heading = clean_heading(section.heading)
@@ -78,6 +152,24 @@ def render_section(section: GeneratedSection) -> str:
       <h2>{escape(heading)}</h2>
       <p>{escape(body)}</p>
       {source_note(section)}
+    </section>
+    """
+
+
+def render_book_detail_page_content(book: BookItem) -> str:
+    return f"""
+    <section class="section book-detail">
+      <div class="section-label">Book Page</div>
+      <h2>{escape(book.title)}</h2>
+      <p>{escape(book.summary)}</p>
+      <p class="source-note">Generated from uploaded document: {escape(book.source_name)}</p>
+      <div class="book-actions">
+        <button type="button" onclick='addBookToCart({json.dumps(book.model_dump())})'>
+          Add {escape(book.title)} to Cart
+        </button>
+        <a class="button-link secondary" href="books.html">Back to Books</a>
+      </div>
+      {render_cart_box()}
     </section>
     """
 
@@ -228,7 +320,8 @@ def page_css(theme: ThemeSpec) -> str:
       gap: 20px;
       margin-top: 24px;
     }}
-    .page-card {{
+    .page-card,
+    .book-card {{
       display: block;
       border: 1px solid var(--border);
       border-radius: 18px;
@@ -256,12 +349,6 @@ def page_css(theme: ThemeSpec) -> str:
       color: var(--muted);
       font-size: 0.95rem;
     }}
-    .book-card {{
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 20px;
-      background: var(--bg);
-    }}
     .book-cover {{
       height: 140px;
       display: grid;
@@ -269,11 +356,14 @@ def page_css(theme: ThemeSpec) -> str:
       border-radius: 14px;
       background: var(--cover-gradient);
       color: white;
-      font-size: 1.7rem;
+      font-size: 1.2rem;
       font-weight: 800;
       margin-bottom: 16px;
+      text-align: center;
+      padding: 12px;
     }}
-    button {{
+    button,
+    .button-link {{
       border: 0;
       border-radius: 999px;
       padding: 10px 18px;
@@ -281,18 +371,115 @@ def page_css(theme: ThemeSpec) -> str:
       color: white;
       font-weight: 700;
       cursor: pointer;
+      display: inline-block;
+      margin: 6px 8px 6px 0;
+      text-decoration: none;
     }}
-    .cart-box {{
-      margin-top: 20px;
-      padding: 16px;
-      border-radius: 16px;
+    .button-link.secondary {{
+      background: var(--muted);
+    }}
+    .cart-panel {{
+      margin-top: 24px;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
       background: var(--accent-soft);
+    }}
+    .cart-panel ul {{
+      margin: 10px 0;
+      padding-left: 20px;
+    }}
+    .empty-state {{
+      grid-column: 1 / -1;
+      border: 1px dashed var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      background: var(--bg);
     }}
     footer {{
       text-align: center;
       color: var(--muted);
       padding: 36px 24px;
     }}
+    """
+
+
+def cart_script() -> str:
+    return """
+  <script>
+    const CART_KEY = "agenticSiteFactoryCart";
+
+    function readCart() {
+      try {
+        return JSON.parse(localStorage.getItem(CART_KEY) || "[]");
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function writeCart(cart) {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+      renderCart();
+    }
+
+    function addBookToCart(book) {
+      const cart = readCart();
+      const existing = cart.find((item) => item.id === book.id);
+
+      if (existing) {
+        existing.quantity = (existing.quantity || 1) + 1;
+      } else {
+        cart.push({
+          id: book.id,
+          title: book.title,
+          source_name: book.source_name,
+          quantity: 1
+        });
+      }
+
+      writeCart(cart);
+    }
+
+    function addDemoCartItem() {
+      addBookToCart({
+        id: "demo-book",
+        title: "Demo Book",
+        source_name: "demo",
+        quantity: 1
+      });
+    }
+
+    function clearCart() {
+      writeCart([]);
+    }
+
+    function renderCart() {
+      const cart = readCart();
+      const count = cart.reduce((total, item) => total + (item.quantity || 1), 0);
+      document.querySelectorAll("#cart-count").forEach((element) => {
+        element.textContent = count;
+      });
+      document.querySelectorAll("#cart-items").forEach((list) => {
+        list.innerHTML = "";
+
+        if (cart.length === 0) {
+          const emptyItem = document.createElement("li");
+          emptyItem.textContent = "Cart is empty.";
+          list.appendChild(emptyItem);
+          return;
+        }
+
+        cart.forEach((item) => {
+          const lineItem = document.createElement("li");
+          lineItem.textContent = `${item.title} x ${item.quantity || 1}`;
+          list.appendChild(lineItem);
+        });
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", renderCart);
+    renderCart();
+  </script>
     """
 
 
@@ -331,17 +518,7 @@ def render_page(
   <footer>
     Generated by Agentic Site Factory. Visual style: {escape(sanitize_body(theme.name))}.
   </footer>
-  <script>
-    let cartCount = 0;
-
-    function addToCart(itemName) {{
-      cartCount += 1;
-      const cartCountElement = document.getElementById('cart-count');
-      if (cartCountElement) {{
-        cartCountElement.textContent = cartCount;
-      }}
-    }}
-  </script>
+  {cart_script()}
 </body>
 </html>
 """
@@ -351,9 +528,11 @@ def build_pages(
     spec: SiteSpec,
     sections: list[GeneratedSection],
     theme: ThemeSpec,
+    documents: list[SourceDocument] | None = None,
 ) -> dict[str, str]:
     title = f"{sanitize_heading(spec.author_name, fallback='Demo Author')} - Official Author Site"
-    all_sections = "\n".join(render_section(section) for section in sections)
+    books = build_book_catalog(documents or [])
+    all_sections = "\n".join(render_section(section, books) for section in sections)
     home_content = render_home_intro(spec, sections) + "\n" + all_sections
 
     pages = {
@@ -374,8 +553,18 @@ def build_pages(
             sections=sections,
             theme=theme,
             current_page=filename,
-            main_content=render_section(section),
+            main_content=render_section(section, books),
             page_title=f"{clean_heading(section.heading)} - {title}",
+        )
+
+    for book in books:
+        pages[book.page_filename] = render_page(
+            spec=spec,
+            sections=sections,
+            theme=theme,
+            current_page="books.html",
+            main_content=render_book_detail_page_content(book),
+            page_title=f"{book.title} - {title}",
         )
 
     return pages
@@ -385,10 +574,11 @@ def build_html(
     spec: SiteSpec,
     sections: list[GeneratedSection],
     theme: ThemeSpec | None = None,
+    documents: list[SourceDocument] | None = None,
 ) -> GeneratedSite:
     title = f"{sanitize_heading(spec.author_name, fallback='Demo Author')} - Official Author Site"
     resolved_theme = theme or infer_custom_theme(spec, documents=[], passages=[])
-    pages = build_pages(spec, sections, resolved_theme)
+    pages = build_pages(spec, sections, resolved_theme, documents=documents)
     html = pages["index.html"]
 
     return GeneratedSite(

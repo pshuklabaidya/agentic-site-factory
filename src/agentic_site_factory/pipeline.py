@@ -47,7 +47,7 @@ def run_generation_pipeline(
     theme = infer_custom_theme(spec, documents, passages)
     plan = plan_site(spec, passages)
     sections = generate_sections(spec, passages)
-    site = build_html(spec, sections, theme=theme)
+    site = build_html(spec, sections, theme=theme, documents=documents)
     quality_report = evaluate_site(spec, site, passages)
 
     manifest = None

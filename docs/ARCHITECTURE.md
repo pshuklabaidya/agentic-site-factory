@@ -180,3 +180,12 @@ Generate from JSON specification:
 
 
 - Generated websites are multi-page static artifacts with index.html plus one HTML file per generated section.
+
+
+- The Books page lists uploaded documents classified as books, with brief summaries.
+
+
+- Each detected book gets its own generated book page with an Add to Cart action.
+
+
+- The demo cart uses browser localStorage so cart contents persist across generated pages and browser sessions.

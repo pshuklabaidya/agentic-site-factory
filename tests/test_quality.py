@@ -3,30 +3,33 @@ from agentic_site_factory.quality import evaluate_site
 from agentic_site_factory.theming import infer_custom_theme
 
 
-def test_evaluate_site_passes_for_complete_site():
-    spec = SiteSpec(requested_sections=["hero", "shop"])
+def test_evaluate_site_passes_for_persistent_book_cart():
+    spec = SiteSpec(author_name="Demo Author", requested_sections=["books", "shop"])
     theme = infer_custom_theme(spec, [], [])
-    sections = [
-        GeneratedSection(
-            name="hero",
-            heading="Hero",
-            body="Body",
-            evidence_sources=["sample.txt"],
-        ),
-        GeneratedSection(
-            name="shop",
-            heading="Shop",
-            body="Body",
-            evidence_sources=["sample.txt"],
-        ),
-    ]
+    html = """
+    <!doctype html>
+    <html>
+      <head><title>Demo</title></head>
+      <body>
+        <main>
+          <section>books shop source.txt</section>
+          <button onclick="addBookToCart({})">Add to Cart</button>
+          <span id="cart-count">0</span>
+          <script>
+            localStorage.setItem("agenticSiteFactoryCart", "[]");
+          </script>
+        </main>
+      </body>
+    </html>
+    """
     site = GeneratedSite(
         title="Demo",
-        html="<!doctype html><header></header><main></main><script>addToCart(); cart-count</script></html>",
-        sections=sections,
+        html=html,
+        sections=[GeneratedSection(name="books", heading="Books", body="Book list.")],
         theme=theme,
+        pages={"index.html": html, "books.html": html},
     )
-    passages = [RetrievedPassage(source="sample.txt", text="Evidence", score=0.9)]
+    passages = [RetrievedPassage(source="source.txt", text="Evidence", score=1.0)]
 
     report = evaluate_site(spec, site, passages)
 
