@@ -1,7 +1,11 @@
 from pathlib import Path
 
 from agentic_site_factory.models import GeneratedSection, SiteSpec
-from agentic_site_factory.site_builder import build_html, save_site
+from agentic_site_factory.site_builder import build_html, clean_heading, save_site
+
+
+def test_clean_heading_removes_angle_wrappers():
+    assert clean_heading("<Books>") == "Books"
 
 
 def test_build_html_contains_author_name():
@@ -13,6 +17,17 @@ def test_build_html_contains_author_name():
     assert "Demo Author" in site.html
     assert "Author biography." in site.html
     assert site.theme.name
+
+
+def test_build_html_nav_uses_in_page_scroll_handler():
+    spec = SiteSpec(author_name="Demo Author")
+    sections = [GeneratedSection(name="books", heading="<Books>", body="Book list.")]
+
+    site = build_html(spec, sections)
+
+    assert "data-target=\"books\"" in site.html
+    assert "scrollIntoView" in site.html
+    assert "<Books>" not in site.html
 
 
 def test_save_site_writes_index_html(tmp_path: Path):

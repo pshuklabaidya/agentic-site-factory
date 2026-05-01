@@ -10,7 +10,7 @@ from agentic_site_factory.bundle import create_zip_archive
 from agentic_site_factory.ingestion import extract_uploaded_document, load_local_text_documents
 from agentic_site_factory.models import SiteSpec, SourceDocument
 from agentic_site_factory.pipeline import run_generation_pipeline
-from agentic_site_factory.preview_links import create_open_site_link
+from agentic_site_factory.preview_links import create_open_site_component
 from agentic_site_factory.retrieval import retrieve_passages
 from agentic_site_factory.theming import infer_custom_theme
 
@@ -150,7 +150,7 @@ with right:
         if result.manifest is not None:
             st.write(f"**Artifact files:** {', '.join(result.manifest.files)}")
 
-        st.markdown(create_open_site_link(result.site.html), unsafe_allow_html=True)
+        components.html(create_open_site_component(result.site.html), height=70)
 
         with st.expander("Quality Report"):
             for check in result.quality_report.checks:

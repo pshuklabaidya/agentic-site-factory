@@ -1,10 +1,30 @@
 from __future__ import annotations
 
-from html import escape
+import re
+from html import escape, unescape
 from pathlib import Path
 
 from agentic_site_factory.models import GeneratedSection, GeneratedSite, SiteSpec, ThemeSpec
 from agentic_site_factory.theming import infer_custom_theme
+
+
+def clean_heading(value: str) -> str:
+    cleaned = unescape(value).strip()
+
+    if cleaned.startswith("<") and cleaned.endswith(">") and cleaned.count("<") == 1:
+        inner = cleaned[1:-1].strip()
+        if inner and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 _&'-]*", inner):
+            return inner
+
+    cleaned = re.sub(r"<\s*/?\s*[^>]+>", "", cleaned)
+    cleaned = cleaned.strip("<> ").strip()
+    return cleaned or "Section"
+
+
+def clean_section_id(value: str) -> str:
+    cleaned = re.sub(r"[^a-zA-Z0-9_-]+", "-", value.strip().lower())
+    cleaned = cleaned.strip("-")
+    return cleaned or "section"
 
 
 def source_note(section: GeneratedSection) -> str:
@@ -16,10 +36,13 @@ def source_note(section: GeneratedSection) -> str:
 
 
 def render_shop_section(section: GeneratedSection) -> str:
+    section_id = clean_section_id(section.name)
+    heading = clean_heading(section.heading)
+
     return f"""
-    <section id="{escape(section.name)}" class="section">
+    <section id="{escape(section_id)}" class="section">
       <div class="section-label">Commerce Agent</div>
-      <h2>{escape(section.heading)}</h2>
+      <h2>{escape(heading)}</h2>
       <p>{escape(section.body)}</p>
       {source_note(section)}
       <div class="shop-grid">
@@ -48,10 +71,13 @@ def render_section(section: GeneratedSection) -> str:
     if section.name == "shop":
         return render_shop_section(section)
 
+    section_id = clean_section_id(section.name)
+    heading = clean_heading(section.heading)
+
     return f"""
-    <section id="{escape(section.name)}" class="section">
+    <section id="{escape(section_id)}" class="section">
       <div class="section-label">{escape(section.name.title())} Agent</div>
-      <h2>{escape(section.heading)}</h2>
+      <h2>{escape(heading)}</h2>
       <p>{escape(section.body)}</p>
       {source_note(section)}
     </section>
@@ -67,7 +93,12 @@ def build_html(
     resolved_theme = theme or infer_custom_theme(spec, documents=[], passages=[])
     rendered_sections = "\n".join(render_section(section) for section in sections)
     nav_links = "".join(
-        f'<a href="#{escape(section.name)}">{escape(section.heading)}</a>' for section in sections
+        (
+            f'<a href="#{escape(clean_section_id(section.name))}" '
+            f'data-target="{escape(clean_section_id(section.name))}">'
+            f"{escape(clean_heading(section.heading))}</a>"
+        )
+        for section in sections
     )
 
     html = f"""<!doctype html>
@@ -89,6 +120,9 @@ def build_html(
     }}
     * {{
       box-sizing: border-box;
+    }}
+    html {{
+      scroll-behavior: smooth;
     }}
     body {{
       margin: 0;
@@ -131,6 +165,7 @@ def build_html(
       color: var(--ink);
       text-decoration: none;
       font-weight: 700;
+      cursor: pointer;
     }}
     main {{
       width: min(1040px, calc(100% - 32px));
@@ -143,6 +178,7 @@ def build_html(
       padding: 32px;
       margin-bottom: 24px;
       box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+      scroll-margin-top: 90px;
     }}
     .section-label {{
       color: var(--accent);
@@ -225,10 +261,21 @@ def build_html(
   </footer>
   <script>
     let cartCount = 0;
+
     function addToCart(itemName) {{
       cartCount += 1;
       document.getElementById('cart-count').textContent = cartCount;
     }}
+
+    document.querySelectorAll("nav a[data-target]").forEach((link) => {{
+      link.addEventListener("click", (event) => {{
+        event.preventDefault();
+        const target = document.getElementById(link.dataset.target);
+        if (target) {{
+          target.scrollIntoView({{ behavior: "smooth", block: "start" }});
+        }}
+      }});
+    }});
   </script>
 </body>
 </html>
