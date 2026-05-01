@@ -66,7 +66,7 @@ STRAY_ANGLE_PATTERN = re.compile(r"[<>]")
 WHITESPACE_PATTERN = re.compile(r"\s+")
 
 
-def _known_html_tag(match: re.Match[str]) -> str:
+def _remove_known_html_tag(match: re.Match[str]) -> str:
     tag_name = match.group(1).lower()
     if tag_name in HTML_TAG_NAMES:
         return ""
@@ -84,7 +84,7 @@ def sanitize_visible_text(value: str, fallback: str = "") -> str:
     if _is_single_known_html_tag(cleaned):
         return fallback
 
-    cleaned = TAG_PATTERN.sub(_known_html_tag, cleaned)
+    cleaned = TAG_PATTERN.sub(_remove_known_html_tag, cleaned)
     cleaned = ANGLE_WRAPPED_TEXT_PATTERN.sub(r"\1", cleaned)
     cleaned = STRAY_ANGLE_PATTERN.sub("", cleaned)
     cleaned = WHITESPACE_PATTERN.sub(" ", cleaned).strip()
