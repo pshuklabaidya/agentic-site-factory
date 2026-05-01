@@ -6,10 +6,12 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 from agentic_site_factory.agents import generate_sections, openai_available, plan_site
+from agentic_site_factory.artifacts import save_artifact_bundle
 from agentic_site_factory.ingestion import extract_uploaded_document, load_local_text_documents
 from agentic_site_factory.models import SiteSpec, SourceDocument
+from agentic_site_factory.quality import evaluate_site
 from agentic_site_factory.retrieval import retrieve_passages
-from agentic_site_factory.site_builder import build_html, save_site
+from agentic_site_factory.site_builder import build_html
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -91,6 +93,7 @@ with left:
         for step in plan.agent_steps:
             st.write(f"- {step}")
     else:
+        plan = None
         st.info("Add source material and choose at least one section.")
 
     st.subheader("Retrieved Evidence")
@@ -108,11 +111,29 @@ with right:
     disabled = not documents or not requested_sections
 
     if st.button("Build Website", type="primary", disabled=disabled):
+        current_plan = plan_site(spec, passages)
         sections = generate_sections(spec, passages)
         site = build_html(spec, sections)
-        output_path = save_site(site, ROOT / "generated_sites" / "latest")
+        quality_report = evaluate_site(spec, site, passages)
+        output_dir = ROOT / "generated_sites" / "latest"
+        manifest = save_artifact_bundle(
+            output_dir=output_dir,
+            spec=spec,
+            plan=current_plan,
+            site=site,
+            passages=passages,
+            quality_report=quality_report,
+        )
 
-        st.success(f"Website generated: {output_path}")
+        st.success(f"Website generated in {output_dir}")
+        st.write(f"**Quality passed:** {quality_report.passed}")
+        st.write(f"**Artifact files:** {', '.join(manifest.files)}")
+
+        with st.expander("Quality Report"):
+            for check in quality_report.checks:
+                icon = "PASS" if check.passed else "FAIL"
+                st.write(f"**{icon} - {check.name}:** {check.detail}")
+
         st.download_button(
             "Download index.html",
             data=site.html,
