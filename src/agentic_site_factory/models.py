@@ -22,3 +22,23 @@ class RetrievedPassage(BaseModel):
     source: str
     text: str
     score: float
+
+
+class SitePlan(BaseModel):
+    title: str
+    sections: list[str]
+    content_strategy: str
+    agent_steps: list[str]
+
+
+class GeneratedSection(BaseModel):
+    name: str
+    heading: str
+    body: str
+    evidence_sources: list[str] = Field(default_factory=list)
+
+
+class GeneratedSite(BaseModel):
+    title: str
+    html: str
+    sections: list[GeneratedSection]
