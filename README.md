@@ -18,6 +18,8 @@ The project demonstrates how an agentic workflow can transform source documents 
 
 ## Features
 
+- Full artifact bundle download as a ZIP file.
+
 - Theme-aware website rendering with literary, modern, and dark styles.
 
 - Upload TXT and PDF source material.

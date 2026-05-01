@@ -4,6 +4,7 @@ pyproject.toml
 src/agentic_site_factory/__init__.py
 src/agentic_site_factory/agents.py
 src/agentic_site_factory/artifacts.py
+src/agentic_site_factory/bundle.py
 src/agentic_site_factory/ingestion.py
 src/agentic_site_factory/models.py
 src/agentic_site_factory/pipeline.py
@@ -16,6 +17,7 @@ src/agentic_site_factory.egg-info/dependency_links.txt
 src/agentic_site_factory.egg-info/requires.txt
 src/agentic_site_factory.egg-info/top_level.txt
 tests/test_artifacts.py
+tests/test_bundle.py
 tests/test_ingestion.py
 tests/test_pipeline.py
 tests/test_quality.py

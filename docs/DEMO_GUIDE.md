@@ -51,3 +51,6 @@ Without an API key, the deterministic local fallback remains fully functional.
 
 
 - Theme-aware website rendering with literary, modern, and dark styles.
+
+
+- Full artifact bundle download as a ZIP file.

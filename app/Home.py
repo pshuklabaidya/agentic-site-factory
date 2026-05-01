@@ -6,6 +6,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 from agentic_site_factory.agents import openai_available, plan_site
+from agentic_site_factory.bundle import create_zip_archive
 from agentic_site_factory.ingestion import extract_uploaded_document, load_local_text_documents
 from agentic_site_factory.models import SiteSpec, SourceDocument
 from agentic_site_factory.pipeline import run_generation_pipeline
@@ -121,12 +122,14 @@ with right:
 
     if st.button("Build Website", type="primary", disabled=disabled):
         output_dir = ROOT / "generated_sites" / "latest"
+        zip_path = ROOT / "generated_sites" / "latest_site_bundle.zip"
         result = run_generation_pipeline(
             spec=spec,
             documents=documents,
             output_dir=output_dir,
             top_k=6,
         )
+        create_zip_archive(output_dir, zip_path)
 
         st.success(f"Website generated in {output_dir}")
         st.write(f"**Quality passed:** {result.quality_report.passed}")
@@ -144,6 +147,12 @@ with right:
             data=result.site.html,
             file_name="index.html",
             mime="text/html",
+        )
+        st.download_button(
+            "Download full artifact bundle",
+            data=zip_path.read_bytes(),
+            file_name="agentic_site_factory_bundle.zip",
+            mime="application/zip",
         )
         components.html(result.site.html, height=760, scrolling=True)
     else:

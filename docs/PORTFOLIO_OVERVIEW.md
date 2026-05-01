@@ -71,3 +71,6 @@ This project shows practical ability across:
 
 
 - Theme-aware website rendering with literary, modern, and dark styles.
+
+
+- Full artifact bundle download as a ZIP file.
