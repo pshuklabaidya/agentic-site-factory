@@ -23,6 +23,7 @@ def build_demo_site() -> Path:
             "Introduce the author, showcase books, and help readers explore and purchase "
             "featured titles."
         ),
+        theme="literary",
         requested_sections=["hero", "bio", "books", "gallery", "shop", "contact"],
     )
 

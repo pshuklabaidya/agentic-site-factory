@@ -18,6 +18,8 @@ The project demonstrates how an agentic workflow can transform source documents 
 
 ## Features
 
+- Theme-aware website rendering with literary, modern, and dark styles.
+
 - Upload TXT and PDF source material.
 - Retrieve relevant passages from uploaded documents.
 - Generate a website plan from a user specification.

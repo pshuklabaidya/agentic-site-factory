@@ -48,3 +48,6 @@ Set environment variables before launching the app.
     export OPENAI_MODEL="gpt-4o-mini"
 
 Without an API key, the deterministic local fallback remains fully functional.
+
+
+- Theme-aware website rendering with literary, modern, and dark styles.

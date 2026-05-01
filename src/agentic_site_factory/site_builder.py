@@ -6,6 +6,47 @@ from pathlib import Path
 from agentic_site_factory.models import GeneratedSection, GeneratedSite, SiteSpec
 
 
+THEMES = {
+    "literary": {
+        "bg": "#f8f5ef",
+        "ink": "#1f2933",
+        "muted": "#667085",
+        "card": "#ffffff",
+        "accent": "#6d28d9",
+        "accent_soft": "#eee7ff",
+        "border": "#e6e0d6",
+        "font": "Georgia, serif",
+        "cover_gradient": "linear-gradient(135deg, #1f2933, #6d28d9)",
+    },
+    "modern": {
+        "bg": "#f5f7fb",
+        "ink": "#111827",
+        "muted": "#64748b",
+        "card": "#ffffff",
+        "accent": "#2563eb",
+        "accent_soft": "#dbeafe",
+        "border": "#dbe3ef",
+        "font": "Inter, Arial, sans-serif",
+        "cover_gradient": "linear-gradient(135deg, #0f172a, #2563eb)",
+    },
+    "dark": {
+        "bg": "#0f172a",
+        "ink": "#f8fafc",
+        "muted": "#cbd5e1",
+        "card": "#111827",
+        "accent": "#a78bfa",
+        "accent_soft": "#312e81",
+        "border": "#334155",
+        "font": "Inter, Arial, sans-serif",
+        "cover_gradient": "linear-gradient(135deg, #4c1d95, #0f172a)",
+    },
+}
+
+
+def resolve_theme(theme_name: str) -> dict[str, str]:
+    return THEMES.get(theme_name, THEMES["literary"])
+
+
 def source_note(section: GeneratedSection) -> str:
     if not section.evidence_sources:
         return ""
@@ -59,6 +100,7 @@ def render_section(section: GeneratedSection) -> str:
 
 def build_html(spec: SiteSpec, sections: list[GeneratedSection]) -> GeneratedSite:
     title = f"{spec.author_name} - Official Author Site"
+    theme = resolve_theme(spec.theme)
     rendered_sections = "\n".join(render_section(section) for section in sections)
     nav_links = "".join(
         f'<a href="#{escape(section.name)}">{escape(section.heading)}</a>' for section in sections
@@ -72,20 +114,21 @@ def build_html(spec: SiteSpec, sections: list[GeneratedSection]) -> GeneratedSit
   <title>{escape(title)}</title>
   <style>
     :root {{
-      --bg: #f8f5ef;
-      --ink: #1f2933;
-      --muted: #667085;
-      --card: #ffffff;
-      --accent: #6d28d9;
-      --accent-soft: #eee7ff;
-      --border: #e6e0d6;
+      --bg: {theme["bg"]};
+      --ink: {theme["ink"]};
+      --muted: {theme["muted"]};
+      --card: {theme["card"]};
+      --accent: {theme["accent"]};
+      --accent-soft: {theme["accent_soft"]};
+      --border: {theme["border"]};
+      --cover-gradient: {theme["cover_gradient"]};
     }}
     * {{
       box-sizing: border-box;
     }}
     body {{
       margin: 0;
-      font-family: Georgia, serif;
+      font-family: {theme["font"]};
       color: var(--ink);
       background: var(--bg);
       line-height: 1.6;
@@ -93,7 +136,7 @@ def build_html(spec: SiteSpec, sections: list[GeneratedSection]) -> GeneratedSit
     header {{
       padding: 80px 24px;
       text-align: center;
-      background: linear-gradient(135deg, #ffffff, var(--accent-soft));
+      background: linear-gradient(135deg, var(--card), var(--accent-soft));
       border-bottom: 1px solid var(--border);
     }}
     header h1 {{
@@ -114,11 +157,10 @@ def build_html(spec: SiteSpec, sections: list[GeneratedSection]) -> GeneratedSit
       justify-content: center;
       flex-wrap: wrap;
       padding: 16px;
-      background: rgba(255, 255, 255, 0.92);
+      background: var(--card);
       border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
-      backdrop-filter: blur(12px);
       z-index: 10;
     }}
     nav a {{
@@ -136,7 +178,7 @@ def build_html(spec: SiteSpec, sections: list[GeneratedSection]) -> GeneratedSit
       border-radius: 24px;
       padding: 32px;
       margin-bottom: 24px;
-      box-shadow: 0 14px 30px rgba(31, 41, 51, 0.06);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
     }}
     .section-label {{
       color: var(--accent);
@@ -168,14 +210,14 @@ def build_html(spec: SiteSpec, sections: list[GeneratedSection]) -> GeneratedSit
       border: 1px solid var(--border);
       border-radius: 18px;
       padding: 20px;
-      background: #fbfaf7;
+      background: var(--bg);
     }}
     .book-cover {{
       height: 140px;
       display: grid;
       place-items: center;
       border-radius: 14px;
-      background: linear-gradient(135deg, #1f2933, #6d28d9);
+      background: var(--cover-gradient);
       color: white;
       font-size: 1.7rem;
       font-weight: 800;

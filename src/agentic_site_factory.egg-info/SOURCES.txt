@@ -22,3 +22,4 @@ tests/test_quality.py
 tests/test_retrieval.py
 tests/test_site_builder.py
 tests/test_template.py
+tests/test_themes.py

@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 st.set_page_config(
     page_title="Agentic Site Factory",
-    page_icon="ASF",
+    page_icon=":building_construction:",
     layout="wide",
 )
 
@@ -28,6 +28,7 @@ with st.sidebar:
     author_name = st.text_input("Author or brand name", value="Elena Vale")
     audience = st.text_input("Audience", value="literary fiction readers and book clubs")
     tone = st.text_input("Tone", value="warm, elegant, and immersive")
+    theme = st.selectbox("Theme", ["literary", "modern", "dark"], index=0)
     website_goal = st.text_area(
         "Website goal",
         value=(
@@ -68,6 +69,7 @@ spec = SiteSpec(
     audience=audience,
     tone=tone,
     website_goal=website_goal,
+    theme=theme,
     requested_sections=requested_sections,
 )
 
@@ -76,6 +78,7 @@ preview_query = " ".join(
         spec.author_name,
         spec.audience,
         spec.tone,
+        spec.theme,
         spec.website_goal,
         " ".join(spec.requested_sections),
     ]
@@ -91,6 +94,7 @@ with left:
         preview_plan = plan_site(spec, passages)
         st.write(f"**Title:** {preview_plan.title}")
         st.write(f"**Sections:** {', '.join(preview_plan.sections)}")
+        st.write(f"**Theme:** {spec.theme}")
         st.write(preview_plan.content_strategy)
         generation_mode = "OpenAI API" if openai_available() else "Deterministic local fallback"
         st.write(f"**Generation mode:** {generation_mode}")

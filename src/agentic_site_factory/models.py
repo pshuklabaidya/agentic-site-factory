@@ -8,6 +8,7 @@ class SiteSpec(BaseModel):
     audience: str = Field(default="general readers")
     tone: str = Field(default="warm, professional, literary")
     website_goal: str = Field(default="promote books and invite readers to learn more")
+    theme: str = Field(default="literary")
     requested_sections: list[str] = Field(
         default_factory=lambda: ["hero", "bio", "books", "gallery", "shop", "contact"]
     )

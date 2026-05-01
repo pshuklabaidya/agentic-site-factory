@@ -68,3 +68,6 @@ This project shows practical ability across:
 - Streamlit dashboard development
 - Static artifact generation
 - AI portfolio packaging
+
+
+- Theme-aware website rendering with literary, modern, and dark styles.
