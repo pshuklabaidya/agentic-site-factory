@@ -39,6 +39,7 @@ The project demonstrates how an agentic workflow can transform source documents 
 - src/agentic_site_factory/quality.py - Deterministic quality checks.
 - src/agentic_site_factory/retrieval.py - TF-IDF retrieval.
 - src/agentic_site_factory/site_builder.py - Static HTML renderer.
+- src/agentic_site_factory/pipeline.py - Shared generation pipeline.
 - data/sample_manuscripts/ - Synthetic sample content.
 - generated_sites/ - Generated website output.
 - tests/ - Unit tests.

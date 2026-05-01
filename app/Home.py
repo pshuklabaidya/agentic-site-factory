@@ -5,13 +5,11 @@ from pathlib import Path
 import streamlit as st
 import streamlit.components.v1 as components
 
-from agentic_site_factory.agents import generate_sections, openai_available, plan_site
-from agentic_site_factory.artifacts import save_artifact_bundle
+from agentic_site_factory.agents import openai_available, plan_site
 from agentic_site_factory.ingestion import extract_uploaded_document, load_local_text_documents
 from agentic_site_factory.models import SiteSpec, SourceDocument
-from agentic_site_factory.quality import evaluate_site
+from agentic_site_factory.pipeline import run_generation_pipeline
 from agentic_site_factory.retrieval import retrieve_passages
-from agentic_site_factory.site_builder import build_html
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -73,8 +71,16 @@ spec = SiteSpec(
     requested_sections=requested_sections,
 )
 
-query = f"{author_name} {audience} {website_goal} {' '.join(requested_sections)}"
-passages = retrieve_passages(documents, query=query, top_k=6)
+preview_query = " ".join(
+    [
+        spec.author_name,
+        spec.audience,
+        spec.tone,
+        spec.website_goal,
+        " ".join(spec.requested_sections),
+    ]
+)
+passages = retrieve_passages(documents, query=preview_query, top_k=6)
 
 left, right = st.columns([0.44, 0.56])
 
@@ -82,18 +88,17 @@ with left:
     st.subheader("Agent Plan")
 
     if documents and requested_sections:
-        plan = plan_site(spec, passages)
-        st.write(f"**Title:** {plan.title}")
-        st.write(f"**Sections:** {', '.join(plan.sections)}")
-        st.write(plan.content_strategy)
+        preview_plan = plan_site(spec, passages)
+        st.write(f"**Title:** {preview_plan.title}")
+        st.write(f"**Sections:** {', '.join(preview_plan.sections)}")
+        st.write(preview_plan.content_strategy)
         generation_mode = "OpenAI API" if openai_available() else "Deterministic local fallback"
         st.write(f"**Generation mode:** {generation_mode}")
         st.write("**Agent workflow:**")
 
-        for step in plan.agent_steps:
+        for step in preview_plan.agent_steps:
             st.write(f"- {step}")
     else:
-        plan = None
         st.info("Add source material and choose at least one section.")
 
     st.subheader("Retrieved Evidence")
@@ -111,35 +116,31 @@ with right:
     disabled = not documents or not requested_sections
 
     if st.button("Build Website", type="primary", disabled=disabled):
-        current_plan = plan_site(spec, passages)
-        sections = generate_sections(spec, passages)
-        site = build_html(spec, sections)
-        quality_report = evaluate_site(spec, site, passages)
         output_dir = ROOT / "generated_sites" / "latest"
-        manifest = save_artifact_bundle(
-            output_dir=output_dir,
+        result = run_generation_pipeline(
             spec=spec,
-            plan=current_plan,
-            site=site,
-            passages=passages,
-            quality_report=quality_report,
+            documents=documents,
+            output_dir=output_dir,
+            top_k=6,
         )
 
         st.success(f"Website generated in {output_dir}")
-        st.write(f"**Quality passed:** {quality_report.passed}")
-        st.write(f"**Artifact files:** {', '.join(manifest.files)}")
+        st.write(f"**Quality passed:** {result.quality_report.passed}")
+
+        if result.manifest is not None:
+            st.write(f"**Artifact files:** {', '.join(result.manifest.files)}")
 
         with st.expander("Quality Report"):
-            for check in quality_report.checks:
+            for check in result.quality_report.checks:
                 icon = "PASS" if check.passed else "FAIL"
                 st.write(f"**{icon} - {check.name}:** {check.detail}")
 
         st.download_button(
             "Download index.html",
-            data=site.html,
+            data=result.site.html,
             file_name="index.html",
             mime="text/html",
         )
-        components.html(site.html, height=760, scrolling=True)
+        components.html(result.site.html, height=760, scrolling=True)
     else:
         st.write("Click Build Website to generate the static site.")

@@ -6,6 +6,7 @@ src/agentic_site_factory/agents.py
 src/agentic_site_factory/artifacts.py
 src/agentic_site_factory/ingestion.py
 src/agentic_site_factory/models.py
+src/agentic_site_factory/pipeline.py
 src/agentic_site_factory/quality.py
 src/agentic_site_factory/retrieval.py
 src/agentic_site_factory/site_builder.py
@@ -16,6 +17,7 @@ src/agentic_site_factory.egg-info/requires.txt
 src/agentic_site_factory.egg-info/top_level.txt
 tests/test_artifacts.py
 tests/test_ingestion.py
+tests/test_pipeline.py
 tests/test_quality.py
 tests/test_retrieval.py
 tests/test_site_builder.py
