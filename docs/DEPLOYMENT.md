@@ -73,3 +73,6 @@ This prevents local uploads and generated files from being accidentally committe
 
 The Streamlit app uses OpenAI generation when `OPENAI_API_KEY` is available. Repository validation commands use deterministic local generation by setting `AGENTIC_SITE_FACTORY_DISABLE_OPENAI=1`, so tests and CLI demos stay fast and do not spend API credits.
 
+
+
+- Generated sites are published to Streamlit static files and opened as real separate-tab pages.

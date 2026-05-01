@@ -171,3 +171,6 @@ Generate from JSON specification:
 
 
 - The generated artifact bundle includes theme_spec.json with the inferred visual style rationale and CSS values.
+
+
+- Generated sites are published to Streamlit static files and opened as real separate-tab pages.

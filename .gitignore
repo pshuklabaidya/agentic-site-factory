@@ -7,3 +7,5 @@ __pycache__/
 .streamlit/secrets.toml
 generated_sites/*
 !generated_sites/.gitkeep
+app/static/generated_sites/*
+!app/static/generated_sites/.gitkeep

@@ -45,6 +45,8 @@ The project demonstrates how an agentic workflow can transform source documents 
 
 ## Features
 
+- Generated sites are published to Streamlit static files and opened as real separate-tab pages.
+
 - OpenAI configuration supports environment variables, local .env files, and Streamlit secrets.
 
 - The generated artifact bundle includes theme_spec.json with the inferred visual style rationale and CSS values.

@@ -14,6 +14,7 @@ src/agentic_site_factory/retrieval.py
 src/agentic_site_factory/settings.py
 src/agentic_site_factory/site_builder.py
 src/agentic_site_factory/spec_generation.py
+src/agentic_site_factory/static_publish.py
 src/agentic_site_factory/theming.py
 src/agentic_site_factory.egg-info/PKG-INFO
 src/agentic_site_factory.egg-info/SOURCES.txt
@@ -30,6 +31,7 @@ tests/test_quality.py
 tests/test_retrieval.py
 tests/test_settings.py
 tests/test_site_builder.py
+tests/test_static_publish.py
 tests/test_template.py
 tests/test_themes.py
 tests/test_theming.py
