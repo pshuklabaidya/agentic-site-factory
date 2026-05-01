@@ -6,6 +6,7 @@ from openai import OpenAI, OpenAIError
 
 from agentic_site_factory.models import GeneratedSection, RetrievedPassage, SitePlan, SiteSpec
 from agentic_site_factory.settings import load_openai_settings
+from agentic_site_factory.text_sanitizer import sanitize_body, sanitize_heading
 
 
 def openai_available() -> bool:
@@ -175,6 +176,8 @@ Body: <body>
         return generate_section_deterministic(section_name, spec, passages)
 
     heading, body = parse_heading_body(text, section_name.title())
+    heading = sanitize_heading(heading, fallback=section_name.title())
+    body = sanitize_body(body)
     sources = sorted({passage.source for passage in passages if passage.source})
 
     return GeneratedSection(

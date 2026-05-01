@@ -1,25 +1,16 @@
 from __future__ import annotations
 
 import re
-from html import escape, unescape
+from html import escape
 from pathlib import Path
 
 from agentic_site_factory.models import GeneratedSection, GeneratedSite, SiteSpec, ThemeSpec
+from agentic_site_factory.text_sanitizer import sanitize_body, sanitize_heading
 from agentic_site_factory.theming import infer_custom_theme
 
 
 def clean_heading(value: str) -> str:
-    cleaned = unescape(value).strip()
-
-    if cleaned.startswith("<") and cleaned.endswith(">") and cleaned.count("<") == 1:
-        inner = cleaned[1:-1].strip()
-        if inner and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 _&'-]*", inner):
-            return inner
-
-    cleaned = re.sub(r"<\s*/?\s*[^>]+>", "", cleaned)
-    cleaned = cleaned.strip("<> ").strip()
-    return cleaned or "Section"
-
+    return sanitize_heading(value, fallback="Section")
 
 def clean_section_id(value: str) -> str:
     cleaned = re.sub(r"[^a-zA-Z0-9_-]+", "-", value.strip().lower())
@@ -43,7 +34,7 @@ def render_shop_section(section: GeneratedSection) -> str:
     <section id="{escape(section_id)}" class="section">
       <div class="section-label">Commerce Agent</div>
       <h2>{escape(heading)}</h2>
-      <p>{escape(section.body)}</p>
+      <p>{escape(sanitize_body(section.body))}</p>
       {source_note(section)}
       <div class="shop-grid">
         <article class="book-card">
@@ -78,7 +69,7 @@ def render_section(section: GeneratedSection) -> str:
     <section id="{escape(section_id)}" class="section">
       <div class="section-label">{escape(section.name.title())} Agent</div>
       <h2>{escape(heading)}</h2>
-      <p>{escape(section.body)}</p>
+      <p>{escape(sanitize_body(section.body))}</p>
       {source_note(section)}
     </section>
     """
