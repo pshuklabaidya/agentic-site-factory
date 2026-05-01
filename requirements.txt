@@ -1,5 +1,1 @@
-streamlit
-pandas
-pytest
-ruff
-python-dotenv
+-e .

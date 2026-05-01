@@ -72,6 +72,23 @@ The project demonstrates how an agentic workflow can transform source documents 
 - docs/ARCHITECTURE.md - System architecture and component responsibilities.
 - docs/ROADMAP.md - Completed baseline and future enhancements.
 
+## Streamlit Community Cloud Deployment
+
+Use these deployment settings:
+
+    Repository: pshuklabaidya/agentic-site-factory
+    Branch: main
+    Main file path: app/Home.py
+
+The repository includes requirements.txt with `-e .` so Streamlit Cloud installs the local package from the `src/` layout before launching the app.
+
+Required secrets:
+
+    OPENAI_API_KEY = "your-openai-api-key"
+    OPENAI_MODEL = "gpt-5-mini"
+
+The app still runs without OpenAI secrets through deterministic local fallback generation.
+
 ## Developer Commands
 
 Common commands are available through Make.
