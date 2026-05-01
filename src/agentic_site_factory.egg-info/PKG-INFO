@@ -66,6 +66,20 @@ The project demonstrates how an agentic workflow can transform source documents 
 - generated_sites/ - Generated website output.
 - tests/ - Unit tests.
 - docs/PORTFOLIO_OVERVIEW.md - Portfolio explanation.
+- docs/DEMO_GUIDE.md - Demo walkthrough.
+- docs/DEPLOYMENT.md - Local, Codespaces, and Streamlit deployment notes.
+
+## Developer Commands
+
+Common commands are available through Make.
+
+    make install
+    make test
+    make lint
+    make check
+    make demo
+    make app
+    make clean
 
 ## Local Setup
 

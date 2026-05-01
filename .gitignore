@@ -2,8 +2,8 @@
 __pycache__/
 .pytest_cache/
 .ruff_cache/
-.streamlit/
 .env
 .DS_Store
+.streamlit/secrets.toml
 generated_sites/*
 !generated_sites/.gitkeep

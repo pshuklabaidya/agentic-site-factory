@@ -74,3 +74,18 @@ This project shows practical ability across:
 
 
 - Full artifact bundle download as a ZIP file.
+
+
+## Reviewer Commands
+
+Fast repository verification:
+
+    make install
+    make check
+    make demo
+
+Dashboard launch:
+
+    make app
+
+Deployment notes are available in docs/DEPLOYMENT.md.
