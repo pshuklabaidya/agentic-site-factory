@@ -64,6 +64,19 @@ Set these environment variables before running Streamlit.
 
 Without an API key, deterministic local fallback mode remains fully functional.
 
+## Command-Line Demo
+
+Generate a demo artifact bundle without launching Streamlit.
+
+    source .venv/bin/activate
+    python scripts/generate_demo_site.py
+
+The command writes output to:
+
+    generated_sites/demo_cli
+
+See docs/DEMO_GUIDE.md for the full walkthrough.
+
 ## Generated Output
 
 After clicking Build Website in the app, the generated artifact bundle is saved to:
