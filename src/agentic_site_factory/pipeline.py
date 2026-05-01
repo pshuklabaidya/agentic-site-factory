@@ -9,6 +9,7 @@ from agentic_site_factory.models import GeneratedSite, RetrievedPassage, SitePla
 from agentic_site_factory.quality import QualityReport, evaluate_site
 from agentic_site_factory.retrieval import retrieve_passages
 from agentic_site_factory.site_builder import build_html
+from agentic_site_factory.theming import infer_custom_theme
 
 
 @dataclass(frozen=True)
@@ -29,6 +30,7 @@ def build_query(spec: SiteSpec) -> str:
             spec.audience,
             spec.tone,
             spec.website_goal,
+            spec.style_guidance,
             " ".join(spec.requested_sections),
         ]
     )
@@ -42,9 +44,10 @@ def run_generation_pipeline(
 ) -> GenerationResult:
     query = build_query(spec)
     passages = retrieve_passages(documents, query=query, top_k=top_k)
+    theme = infer_custom_theme(spec, documents, passages)
     plan = plan_site(spec, passages)
     sections = generate_sections(spec, passages)
-    site = build_html(spec, sections)
+    site = build_html(spec, sections, theme=theme)
     quality_report = evaluate_site(spec, site, passages)
 
     manifest = None

@@ -8,7 +8,7 @@
 - Agent-style planning.
 - Deterministic section generation.
 - Optional OpenAI section generation.
-- Theme-aware static website rendering.
+- Custom style-aware static website rendering.
 - Demo commerce section.
 - Quality checks.
 - Artifact manifest.
@@ -38,3 +38,9 @@
 - Add Stripe, Shopify, or Gumroad integration stubs.
 - Add browser-based preview tests.
 - Add Docker support.
+
+
+- Custom aesthetics are inferred from the website specification, optional style guidance, retrieved passages, and uploaded source material.
+
+
+- The generated artifact bundle includes theme_spec.json with the inferred visual style rationale and CSS values.

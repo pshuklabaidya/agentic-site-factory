@@ -12,6 +12,7 @@ def test_build_html_contains_author_name():
 
     assert "Demo Author" in site.html
     assert "Author biography." in site.html
+    assert site.theme.name
 
 
 def test_save_site_writes_index_html(tmp_path: Path):

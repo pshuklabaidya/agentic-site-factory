@@ -16,6 +16,8 @@ class ArtifactManifest(BaseModel):
     author_name: str
     requested_sections: list[str]
     generated_sections: list[str]
+    inferred_theme_name: str
+    inferred_theme_rationale: str
     evidence_sources: list[str]
     quality_passed: bool
     files: list[str] = Field(default_factory=list)
@@ -39,6 +41,7 @@ def save_artifact_bundle(
     plan_path = output_dir / "site_plan.json"
     evidence_path = output_dir / "evidence_map.json"
     quality_path = output_dir / "quality_report.json"
+    theme_path = output_dir / "theme_spec.json"
     manifest_path = output_dir / "artifact_manifest.json"
 
     index_path.write_text(site.html, encoding="utf-8")
@@ -54,6 +57,7 @@ def save_artifact_bundle(
         },
     )
     write_json(quality_path, quality_report.model_dump())
+    write_json(theme_path, site.theme.model_dump())
 
     evidence_sources = sorted({passage.source for passage in passages if passage.source})
     manifest = ArtifactManifest(
@@ -61,6 +65,8 @@ def save_artifact_bundle(
         author_name=spec.author_name,
         requested_sections=spec.requested_sections,
         generated_sections=[section.name for section in site.sections],
+        inferred_theme_name=site.theme.name,
+        inferred_theme_rationale=site.theme.rationale,
         evidence_sources=evidence_sources,
         quality_passed=quality_report.passed,
         files=[
@@ -68,6 +74,7 @@ def save_artifact_bundle(
             plan_path.name,
             evidence_path.name,
             quality_path.name,
+            theme_path.name,
             manifest_path.name,
         ],
     )

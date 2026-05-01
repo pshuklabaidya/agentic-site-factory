@@ -1,10 +1,12 @@
 from agentic_site_factory.artifacts import save_artifact_bundle
 from agentic_site_factory.models import GeneratedSection, GeneratedSite, RetrievedPassage, SitePlan, SiteSpec
 from agentic_site_factory.quality import evaluate_site
+from agentic_site_factory.theming import infer_custom_theme
 
 
 def test_save_artifact_bundle_writes_expected_files(tmp_path):
     spec = SiteSpec(author_name="Demo Author", requested_sections=["hero"])
+    theme = infer_custom_theme(spec, [], [])
     plan = SitePlan(
         title="Demo Site",
         sections=["hero"],
@@ -22,6 +24,7 @@ def test_save_artifact_bundle_writes_expected_files(tmp_path):
                 evidence_sources=["source.txt"],
             )
         ],
+        theme=theme,
     )
     passages = [RetrievedPassage(source="source.txt", text="Evidence", score=1.0)]
     quality_report = evaluate_site(spec, site, passages)
@@ -40,4 +43,5 @@ def test_save_artifact_bundle_writes_expected_files(tmp_path):
     assert (tmp_path / "site_plan.json").exists()
     assert (tmp_path / "evidence_map.json").exists()
     assert (tmp_path / "quality_report.json").exists()
+    assert (tmp_path / "theme_spec.json").exists()
     assert (tmp_path / "artifact_manifest.json").exists()

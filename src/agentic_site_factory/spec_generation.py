@@ -15,7 +15,7 @@ class GenerationSpecFile(BaseModel):
     audience: str
     tone: str
     website_goal: str
-    theme: str = "literary"
+    style_guidance: str = ""
     requested_sections: list[str] = Field(
         default_factory=lambda: ["hero", "bio", "books", "gallery", "shop", "contact"]
     )
@@ -44,7 +44,7 @@ def build_site_from_spec_file(spec_path: Path, root: Path | None = None) -> Path
         audience=generation_spec.audience,
         tone=generation_spec.tone,
         website_goal=generation_spec.website_goal,
-        theme=generation_spec.theme,
+        style_guidance=generation_spec.style_guidance,
         requested_sections=generation_spec.requested_sections,
     )
 

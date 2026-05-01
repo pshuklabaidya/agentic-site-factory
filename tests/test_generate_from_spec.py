@@ -9,7 +9,7 @@ def test_load_generation_spec_reads_sample_spec():
     spec = load_generation_spec(spec_path)
 
     assert spec.author_name == "Elena Vale"
-    assert spec.theme == "literary"
+    assert spec.style_guidance == ""
     assert "shop" in spec.requested_sections
     assert spec.source_files == ["data/sample_manuscripts/elena_vale.txt"]
 
@@ -29,7 +29,7 @@ def test_build_site_from_spec_file_generates_artifacts(tmp_path):
   "audience": "readers",
   "tone": "warm",
   "website_goal": "Introduce books to readers.",
-  "theme": "modern",
+  "style_guidance": "modern professional",
   "requested_sections": ["hero", "shop"],
   "source_files": ["sample.txt"],
   "output_dir": "output"
@@ -42,3 +42,4 @@ def test_build_site_from_spec_file_generates_artifacts(tmp_path):
 
     assert (output_dir / "index.html").exists()
     assert (output_dir / "artifact_manifest.json").exists()
+    assert (output_dir / "theme_spec.json").exists()

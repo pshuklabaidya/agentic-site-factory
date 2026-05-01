@@ -8,7 +8,10 @@ class SiteSpec(BaseModel):
     audience: str = Field(default="general readers")
     tone: str = Field(default="warm, professional, literary")
     website_goal: str = Field(default="promote books and invite readers to learn more")
-    theme: str = Field(default="literary")
+    style_guidance: str = Field(
+        default="",
+        description="Optional visual style guidance. Leave blank for inferred styling.",
+    )
     requested_sections: list[str] = Field(
         default_factory=lambda: ["hero", "bio", "books", "gallery", "shop", "contact"]
     )
@@ -39,7 +42,22 @@ class GeneratedSection(BaseModel):
     evidence_sources: list[str] = Field(default_factory=list)
 
 
+class ThemeSpec(BaseModel):
+    name: str
+    rationale: str
+    font_family: str
+    background: str
+    ink: str
+    muted: str
+    card: str
+    accent: str
+    accent_soft: str
+    border: str
+    cover_gradient: str
+
+
 class GeneratedSite(BaseModel):
     title: str
     html: str
     sections: list[GeneratedSection]
+    theme: ThemeSpec

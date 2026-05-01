@@ -50,7 +50,13 @@ Set environment variables before launching the app.
 Without an API key, the deterministic local fallback remains fully functional.
 
 
-- Theme-aware website rendering with literary, modern, and dark styles.
+- Custom style-aware website rendering with literary, modern, and dark styles.
 
 
 - Full artifact bundle download as a ZIP file.
+
+
+- Custom aesthetics are inferred from the website specification, optional style guidance, retrieved passages, and uploaded source material.
+
+
+- The generated artifact bundle includes theme_spec.json with the inferred visual style rationale and CSS values.

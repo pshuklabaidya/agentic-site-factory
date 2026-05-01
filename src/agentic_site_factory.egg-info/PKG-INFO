@@ -45,9 +45,13 @@ The project demonstrates how an agentic workflow can transform source documents 
 
 ## Features
 
+- The generated artifact bundle includes theme_spec.json with the inferred visual style rationale and CSS values.
+
+- Custom aesthetics are inferred from the website specification, optional style guidance, retrieved passages, and uploaded source material.
+
 - Full artifact bundle download as a ZIP file.
 
-- Theme-aware website rendering with literary, modern, and dark styles.
+- Custom style-aware website rendering with literary, modern, and dark styles.
 
 - Upload TXT and PDF source material.
 - Retrieve relevant passages from uploaded documents.

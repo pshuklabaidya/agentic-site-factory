@@ -113,8 +113,8 @@ File:
 
 Responsibilities:
 
-- Renders theme-aware HTML.
-- Supports literary, modern, and dark themes.
+- Renders custom style-aware HTML.
+- Supports custom inferred visual styles.
 - Includes demo commerce behavior.
 - Produces a standalone static site.
 
@@ -165,3 +165,9 @@ Generate from JSON specification:
 - All generated claims should be grounded in retrieved source material.
 - Generated artifacts are ignored by Git.
 - Tests cover the retrieval, ingestion, pipeline, quality, artifact, theme, and bundle layers.
+
+
+- Custom aesthetics are inferred from the website specification, optional style guidance, retrieved passages, and uploaded source material.
+
+
+- The generated artifact bundle includes theme_spec.json with the inferred visual style rationale and CSS values.

@@ -59,3 +59,9 @@ Generated website bundles are intentionally ignored by Git. The repository keeps
     generated_sites/.gitkeep
 
 This prevents local uploads and generated files from being accidentally committed.
+
+
+- Custom aesthetics are inferred from the website specification, optional style guidance, retrieved passages, and uploaded source material.
+
+
+- The generated artifact bundle includes theme_spec.json with the inferred visual style rationale and CSS values.

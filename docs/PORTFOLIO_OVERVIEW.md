@@ -70,7 +70,7 @@ This project shows practical ability across:
 - AI portfolio packaging
 
 
-- Theme-aware website rendering with literary, modern, and dark styles.
+- Custom style-aware website rendering with literary, modern, and dark styles.
 
 
 - Full artifact bundle download as a ZIP file.
@@ -89,3 +89,9 @@ Dashboard launch:
     make app
 
 Deployment notes are available in docs/DEPLOYMENT.md.
+
+
+- Custom aesthetics are inferred from the website specification, optional style guidance, retrieved passages, and uploaded source material.
+
+
+- The generated artifact bundle includes theme_spec.json with the inferred visual style rationale and CSS values.

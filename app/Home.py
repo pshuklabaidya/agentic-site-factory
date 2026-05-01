@@ -10,7 +10,9 @@ from agentic_site_factory.bundle import create_zip_archive
 from agentic_site_factory.ingestion import extract_uploaded_document, load_local_text_documents
 from agentic_site_factory.models import SiteSpec, SourceDocument
 from agentic_site_factory.pipeline import run_generation_pipeline
+from agentic_site_factory.preview_links import create_open_site_link
 from agentic_site_factory.retrieval import retrieve_passages
+from agentic_site_factory.theming import infer_custom_theme
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,7 +31,13 @@ with st.sidebar:
     author_name = st.text_input("Author or brand name", value="Elena Vale")
     audience = st.text_input("Audience", value="literary fiction readers and book clubs")
     tone = st.text_input("Tone", value="warm, elegant, and immersive")
-    theme = st.selectbox("Theme", ["literary", "modern", "dark"], index=0)
+    style_guidance = st.text_area(
+        "Optional style guidance",
+        value="",
+        placeholder=(
+            "Leave blank to infer custom aesthetics from the specification and uploaded files."
+        ),
+    )
     website_goal = st.text_area(
         "Website goal",
         value=(
@@ -70,7 +78,7 @@ spec = SiteSpec(
     audience=audience,
     tone=tone,
     website_goal=website_goal,
-    theme=theme,
+    style_guidance=style_guidance,
     requested_sections=requested_sections,
 )
 
@@ -79,12 +87,13 @@ preview_query = " ".join(
         spec.author_name,
         spec.audience,
         spec.tone,
-        spec.theme,
         spec.website_goal,
+        spec.style_guidance,
         " ".join(spec.requested_sections),
     ]
 )
 passages = retrieve_passages(documents, query=preview_query, top_k=6)
+preview_theme = infer_custom_theme(spec, documents, passages)
 
 left, right = st.columns([0.44, 0.56])
 
@@ -95,7 +104,8 @@ with left:
         preview_plan = plan_site(spec, passages)
         st.write(f"**Title:** {preview_plan.title}")
         st.write(f"**Sections:** {', '.join(preview_plan.sections)}")
-        st.write(f"**Theme:** {spec.theme}")
+        st.write(f"**Inferred visual style:** {preview_theme.name}")
+        st.write(f"**Style rationale:** {preview_theme.rationale}")
         st.write(preview_plan.content_strategy)
         generation_mode = "OpenAI API" if openai_available() else "Deterministic local fallback"
         st.write(f"**Generation mode:** {generation_mode}")
@@ -132,10 +142,14 @@ with right:
         create_zip_archive(output_dir, zip_path)
 
         st.success(f"Website generated in {output_dir}")
+        st.write(f"**Inferred visual style:** {result.site.theme.name}")
+        st.write(f"**Style rationale:** {result.site.theme.rationale}")
         st.write(f"**Quality passed:** {result.quality_report.passed}")
 
         if result.manifest is not None:
             st.write(f"**Artifact files:** {', '.join(result.manifest.files)}")
+
+        st.markdown(create_open_site_link(result.site.html), unsafe_allow_html=True)
 
         with st.expander("Quality Report"):
             for check in result.quality_report.checks:
