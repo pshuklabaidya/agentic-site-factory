@@ -10,7 +10,12 @@ def test_select_style_family_prefers_scholarly_for_theology_signals():
             website_goal="Teach doctrine through rich theological study.",
             style_guidance="scholarly and classic",
         ),
-        [SourceDocument(name="lesson.txt", text="A theological study in doctrine, exegesis, and confessional analysis.")],
+        [
+            SourceDocument(
+                name="lesson.txt",
+                text="A theological study in doctrine, exegesis, and confessional analysis.",
+            )
+        ],
         [RetrievedPassage(source="lesson.txt", text="biblical exegesis and doctrine", score=0.8)],
     )
 
@@ -25,7 +30,12 @@ def test_infer_custom_theme_returns_variant_and_palette():
             website_goal="Showcase novels and invite readers into reflective stories.",
             style_guidance="editorial, bookish, intimate",
         ),
-        [SourceDocument(name="novel.txt", text="A literary novel about family, memory, and handwritten letters.")],
+        [
+            SourceDocument(
+                name="novel.txt",
+                text="A literary novel about family, memory, and handwritten letters.",
+            )
+        ],
         [RetrievedPassage(source="novel.txt", text="lyrical coastal story", score=0.9)],
     )
 
