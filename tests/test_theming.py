@@ -1,47 +1,34 @@
-from agentic_site_factory.models import SiteSpec, SourceDocument
+from agentic_site_factory.models import RetrievedPassage, SiteSpec, SourceDocument
 from agentic_site_factory.theming import infer_custom_theme, select_style_family
 
 
-def test_select_style_family_defaults_to_literary():
-    assert select_style_family("") == "literary"
-
-
-def test_infer_custom_theme_uses_business_material():
-    spec = SiteSpec(
-        audience="startup founders",
-        website_goal="Promote consulting services and technology strategy.",
+def test_select_style_family_prefers_scholarly_for_theology_signals():
+    variant = select_style_family(
+        SiteSpec(
+            author_name="Prashant",
+            tone="confessional biblical theology",
+            website_goal="Teach doctrine through rich theological study.",
+            style_guidance="scholarly and classic",
+        ),
+        [SourceDocument(name="lesson.txt", text="A theological study in doctrine, exegesis, and confessional analysis.")],
+        [RetrievedPassage(source="lesson.txt", text="biblical exegesis and doctrine", score=0.8)],
     )
-    documents = [
-        SourceDocument(
-            name="sample.txt",
-            text="This business uses AI, analytics, software, product strategy, and SaaS dashboards.",
-        )
-    ]
 
-    theme = infer_custom_theme(spec, documents, [])
-
-    assert theme.name == "Modern Product"
-    assert theme.accent == "#2563eb"
+    assert variant == "scholarly-classic"
 
 
-def test_infer_custom_theme_uses_dark_material():
-    spec = SiteSpec()
-    documents = [
-        SourceDocument(
-            name="sample.txt",
-            text="A noir thriller about night, shadow, mystery, and suspense.",
-        )
-    ]
+def test_infer_custom_theme_returns_variant_and_palette():
+    theme = infer_custom_theme(
+        SiteSpec(
+            author_name="Elena Vale",
+            tone="warm, elegant, immersive literary fiction",
+            website_goal="Showcase novels and invite readers into reflective stories.",
+            style_guidance="editorial, bookish, intimate",
+        ),
+        [SourceDocument(name="novel.txt", text="A literary novel about family, memory, and handwritten letters.")],
+        [RetrievedPassage(source="novel.txt", text="lyrical coastal story", score=0.9)],
+    )
 
-    theme = infer_custom_theme(spec, documents, [])
-
-    assert theme.name == "Noir Dramatic"
-
-
-def test_style_guidance_participates_in_inference():
-    spec = SiteSpec(style_guidance="luxury boutique elegant premium gallery")
-    documents = [SourceDocument(name="sample.txt", text="A short author profile.")]
-
-    theme = infer_custom_theme(spec, documents, [])
-
-    assert theme.name == "Refined Boutique"
+    assert theme.variant == "editorial-warm"
+    assert theme.background
+    assert theme.cover_gradient

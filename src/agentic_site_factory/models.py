@@ -54,6 +54,7 @@ class ThemeSpec(BaseModel):
     accent_soft: str
     border: str
     cover_gradient: str
+    variant: str = "editorial-warm"
 
 
 class GeneratedSite(BaseModel):

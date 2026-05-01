@@ -5,8 +5,9 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
+from agentic_site_factory.book_summarizer import summarize_book_text
 from agentic_site_factory.models import SourceDocument
-from agentic_site_factory.text_sanitizer import sanitize_body, sanitize_heading
+from agentic_site_factory.text_sanitizer import sanitize_heading
 
 
 BOOK_KEYWORDS = {
@@ -99,28 +100,6 @@ def looks_like_book(document: SourceDocument) -> bool:
     return False
 
 
-def summarize_document(document: SourceDocument, max_words: int = 55) -> str:
-    cleaned = sanitize_body(document.text)
-    sentences = re.split(r"(?<=[.!?])\s+", cleaned)
-    summary_words: list[str] = []
-
-    for sentence in sentences:
-        for word in sentence.split():
-            summary_words.append(word)
-            if len(summary_words) >= max_words:
-                return " ".join(summary_words).rstrip(" .,;:") + "..."
-
-        if len(summary_words) >= 28:
-            break
-
-    summary = " ".join(summary_words).strip()
-
-    if summary:
-        return summary
-
-    return "Summary unavailable from the supplied text."
-
-
 def build_book_catalog(documents: list[SourceDocument]) -> list[BookItem]:
     books: list[BookItem] = []
     used_ids: set[str] = set()
@@ -144,7 +123,7 @@ def build_book_catalog(documents: list[SourceDocument]) -> list[BookItem]:
                 id=book_id,
                 title=title_from_source_name(document.name),
                 source_name=document.name,
-                summary=summarize_document(document),
+                summary=summarize_book_text(document.text, max_sentences=4),
                 page_filename=f"book-{book_id}.html",
             )
         )

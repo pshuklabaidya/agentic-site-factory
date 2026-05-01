@@ -61,7 +61,7 @@ def render_shop_section(section: GeneratedSection, books: list[BookItem]) -> str
         cards = "\n".join(
             f"""
             <article class="book-card">
-              <div class="book-cover">{escape(book.title[:18])}</div>
+              <div class="book-cover">{escape(book.title[:22])}</div>
               <h3>{escape(book.title)}</h3>
               <p>{escape(book.summary)}</p>
               <a class="button-link" href="{escape(book.page_filename)}">View Book</a>
@@ -104,7 +104,7 @@ def render_books_section(section: GeneratedSection, books: list[BookItem]) -> st
     if books:
         cards = "\n".join(
             f"""
-            <a class="page-card" href="{escape(book.page_filename)}">
+            <a class="page-card book-teaser" href="{escape(book.page_filename)}">
               <span>Book</span>
               <strong>{escape(book.title)}</strong>
               <small>{escape(book.summary)}</small>
@@ -236,25 +236,45 @@ def page_css(theme: ThemeSpec) -> str:
       font-family: {theme.font_family};
       color: var(--ink);
       background: var(--bg);
-      line-height: 1.6;
+      line-height: 1.65;
+      transition: background 180ms ease, color 180ms ease;
+    }}
+    body.theme-editorial-warm {{
+      background-image: radial-gradient(circle at top left, rgba(255,255,255,0.32), transparent 28%);
+    }}
+    body.theme-modern-clean {{
+      background-image: linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0));
+    }}
+    body.theme-dramatic-dark {{
+      background-image: radial-gradient(circle at top center, rgba(212,163,115,0.12), transparent 26%);
+    }}
+    body.theme-scholarly-classic {{
+      background-image: linear-gradient(180deg, rgba(29,78,137,0.05), rgba(255,255,255,0));
+    }}
+    body.theme-playful-bright {{
+      background-image: radial-gradient(circle at top right, rgba(249,115,22,0.14), transparent 24%);
     }}
     header {{
-      padding: 80px 24px;
+      padding: 64px 24px 44px;
       text-align: center;
       background: linear-gradient(135deg, var(--card), var(--accent-soft));
       border-bottom: 1px solid var(--border);
     }}
-    header h1 {{
-      margin: 0;
-      font-size: clamp(2.4rem, 6vw, 5rem);
-      line-height: 1;
+    .site-title {{
+      margin: 0 auto;
+      max-width: min(16ch, 100%);
+      font-size: clamp(2.35rem, 8vw, 5.3rem);
+      line-height: 0.95;
       letter-spacing: -0.05em;
+      text-wrap: balance;
+      overflow-wrap: anywhere;
     }}
     header p {{
-      max-width: 760px;
+      max-width: 900px;
       margin: 24px auto 0;
       color: var(--muted);
-      font-size: 1.2rem;
+      font-size: clamp(1.05rem, 2vw, 1.35rem);
+      text-wrap: balance;
     }}
     nav {{
       display: flex;
@@ -280,8 +300,18 @@ def page_css(theme: ThemeSpec) -> str:
       color: var(--accent);
       border-bottom-color: var(--accent);
     }}
+    body.theme-modern-clean nav a,
+    body.theme-playful-bright nav a {{
+      border-bottom: none;
+      border-radius: 999px;
+      padding: 10px 16px;
+    }}
+    body.theme-modern-clean nav a.active,
+    body.theme-playful-bright nav a.active {{
+      background: var(--accent-soft);
+    }}
     main {{
-      width: min(1040px, calc(100% - 32px));
+      width: min(1100px, calc(100% - 32px));
       margin: 40px auto;
     }}
     .section {{
@@ -291,7 +321,22 @@ def page_css(theme: ThemeSpec) -> str:
       padding: 32px;
       margin-bottom: 24px;
       box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
-      scroll-margin-top: 90px;
+    }}
+    body.theme-modern-clean .section {{
+      border-radius: 18px;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.08);
+    }}
+    body.theme-dramatic-dark .section {{
+      border-radius: 28px;
+      box-shadow: 0 18px 34px rgba(0, 0, 0, 0.28);
+    }}
+    body.theme-scholarly-classic .section {{
+      border-radius: 12px;
+      box-shadow: 0 8px 18px rgba(29, 78, 137, 0.08);
+    }}
+    body.theme-playful-bright .section {{
+      border-radius: 28px;
+      box-shadow: 0 14px 26px rgba(249, 115, 22, 0.12);
     }}
     .section-label {{
       color: var(--accent);
@@ -316,20 +361,30 @@ def page_css(theme: ThemeSpec) -> str:
     .page-grid,
     .shop-grid {{
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 22px;
       margin-top: 24px;
     }}
     .page-card,
     .book-card {{
       display: block;
       border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 20px;
+      border-radius: 20px;
+      padding: 22px;
       background: var(--bg);
       color: var(--ink);
       text-decoration: none;
-      min-height: 170px;
+      min-height: 185px;
+      transition: transform 140ms ease, box-shadow 140ms ease;
+    }}
+    .page-card:hover,
+    .book-card:hover {{
+      transform: translateY(-2px);
+      box-shadow: 0 12px 26px rgba(15, 23, 42, 0.10);
+    }}
+    body.theme-dramatic-dark .page-card,
+    body.theme-dramatic-dark .book-card {{
+      background: rgba(255,255,255,0.04);
     }}
     .page-card span {{
       color: var(--accent);
@@ -350,10 +405,10 @@ def page_css(theme: ThemeSpec) -> str:
       font-size: 0.95rem;
     }}
     .book-cover {{
-      height: 140px;
+      height: 150px;
       display: grid;
       place-items: center;
-      border-radius: 14px;
+      border-radius: 16px;
       background: var(--cover-gradient);
       color: white;
       font-size: 1.2rem;
@@ -383,6 +438,7 @@ def page_css(theme: ThemeSpec) -> str:
       padding: 18px;
       border-radius: 18px;
       border: 1px solid var(--border);
+      background: var(--accent_soft, var(--accent-soft));
       background: var(--accent-soft);
     }}
     .cart-panel ul {{
@@ -402,7 +458,6 @@ def page_css(theme: ThemeSpec) -> str:
       padding: 36px 24px;
     }}
     """
-
 
 def cart_script() -> str:
     return """
@@ -482,7 +537,6 @@ def cart_script() -> str:
   </script>
     """
 
-
 def render_page(
     spec: SiteSpec,
     sections: list[GeneratedSection],
@@ -504,9 +558,9 @@ def render_page(
     {page_css(theme)}
   </style>
 </head>
-<body>
+<body class="theme-{escape(theme.variant)}">
   <header>
-    <h1>{escape(author_name)}</h1>
+    <h1 class="site-title">{escape(author_name)}</h1>
     <p>{escape(website_goal)}</p>
   </header>
   <nav>
@@ -522,7 +576,6 @@ def render_page(
 </body>
 </html>
 """
-
 
 def build_pages(
     spec: SiteSpec,
@@ -569,16 +622,16 @@ def build_pages(
 
     return pages
 
-
 def build_html(
     spec: SiteSpec,
     sections: list[GeneratedSection],
     theme: ThemeSpec | None = None,
     documents: list[SourceDocument] | None = None,
 ) -> GeneratedSite:
+    resolved_documents = documents or []
     title = f"{sanitize_heading(spec.author_name, fallback='Demo Author')} - Official Author Site"
-    resolved_theme = theme or infer_custom_theme(spec, documents=[], passages=[])
-    pages = build_pages(spec, sections, resolved_theme, documents=documents)
+    resolved_theme = theme or infer_custom_theme(spec, documents=resolved_documents, passages=[])
+    pages = build_pages(spec, sections, resolved_theme, documents=resolved_documents)
     html = pages["index.html"]
 
     return GeneratedSite(
@@ -588,7 +641,6 @@ def build_html(
         theme=resolved_theme,
         pages=pages,
     )
-
 
 def save_site(site: GeneratedSite, output_dir: Path) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
