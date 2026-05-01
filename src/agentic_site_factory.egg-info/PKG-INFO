@@ -18,7 +18,16 @@ Dynamic: license-file
 
 # Agentic Site Factory
 
+![CI](https://github.com/pshuklabaidya/agentic-site-factory/actions/workflows/ci.yml/badge.svg)
+
+
 Agentic Site Factory is an Agentic RAG portfolio project that turns uploaded manuscripts and natural-language website specifications into generated static website artifacts through an interactive Streamlit dashboard.
+
+## Status
+
+Portfolio-ready baseline complete.
+
+Core application, shared pipeline, CLI demo, JSON spec generation, quality checks, artifact bundling, tests, linting, CI, and documentation are in place.
 
 ## Purpose
 
@@ -68,6 +77,8 @@ The project demonstrates how an agentic workflow can transform source documents 
 - docs/PORTFOLIO_OVERVIEW.md - Portfolio explanation.
 - docs/DEMO_GUIDE.md - Demo walkthrough.
 - docs/DEPLOYMENT.md - Local, Codespaces, and Streamlit deployment notes.
+- docs/ARCHITECTURE.md - System architecture and component responsibilities.
+- docs/ROADMAP.md - Completed baseline and future enhancements.
 
 ## Developer Commands
 
@@ -100,6 +111,17 @@ Set these environment variables before running Streamlit.
     export OPENAI_MODEL="gpt-4o-mini"
 
 Without an API key, deterministic local fallback mode remains fully functional.
+
+## JSON Specification Demo
+
+Generate a website from a JSON specification.
+
+    source .venv/bin/activate
+    python scripts/generate_from_spec.py --spec data/sample_specs/elena_vale_author_site.json
+
+The command writes output to:
+
+    generated_sites/spec_demo
 
 ## Command-Line Demo
 

@@ -1,4 +1,4 @@
-.PHONY: install test lint check demo app clean
+.PHONY: install test lint check demo spec-demo app clean
 
 install:
 	python -m pip install --upgrade pip
@@ -14,6 +14,9 @@ check: test lint
 
 demo:
 	python scripts/generate_demo_site.py
+
+spec-demo:
+	python scripts/generate_from_spec.py --spec data/sample_specs/elena_vale_author_site.json
 
 app:
 	streamlit run app/Home.py

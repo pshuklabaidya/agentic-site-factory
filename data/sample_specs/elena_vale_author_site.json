@@ -1,0 +1,10 @@
+{
+  "author_name": "Elena Vale",
+  "audience": "literary fiction readers and book clubs",
+  "tone": "warm, elegant, and immersive",
+  "website_goal": "Introduce the author, showcase books, and help readers explore and purchase featured titles.",
+  "theme": "literary",
+  "requested_sections": ["hero", "bio", "books", "gallery", "shop", "contact"],
+  "source_files": ["data/sample_manuscripts/elena_vale.txt"],
+  "output_dir": "generated_sites/spec_demo"
+}
