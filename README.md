@@ -4,22 +4,45 @@ Agentic Site Factory is an Agentic RAG portfolio project that turns uploaded man
 
 ## Purpose
 
-The project demonstrates how an agentic workflow can transform source documents into a working website package. A user can upload manuscript-like material, describe the desired site, and receive a generated author website with grounded page copy and a downloadable HTML artifact.
+The project demonstrates how an agentic workflow can transform source documents into a working website package. A user can upload manuscript-like material, describe the desired site, and receive a generated author website with grounded page copy and downloadable artifacts.
 
-## Planned Capabilities
+## Core Workflow
+
+1. Intake agent normalizes the website specification.
+2. Retrieval agent selects source-grounded passages from uploaded material.
+3. Planner agent maps requested sections to page responsibilities.
+4. Writer agent creates section copy from retrieved evidence.
+5. Builder agent renders a static website.
+6. Quality agent checks coverage, evidence, HTML structure, and demo commerce behavior.
+7. Artifact agent saves the generated site package.
+
+## Features
 
 - Upload TXT and PDF source material.
 - Retrieve relevant passages from uploaded documents.
 - Generate a website plan from a user specification.
 - Produce grounded content for website sections.
-- Render a static website artifact.
+- Render a static HTML website artifact.
 - Preview and download the generated site from Streamlit.
+- Save a site plan, evidence map, quality report, and artifact manifest.
 - Run with deterministic local fallback logic.
 - Optionally use the OpenAI API for richer generation.
+- Validate the repository with Pytest, Ruff, and GitHub Actions CI.
 
-## Current Status
+## Repository Structure
 
-Initial scaffold with package structure, baseline models, retrieval logic, tests, and sample manuscript data.
+- app/Home.py - Streamlit dashboard.
+- src/agentic_site_factory/agents.py - Planner and writer agent logic.
+- src/agentic_site_factory/artifacts.py - Artifact bundle generation.
+- src/agentic_site_factory/ingestion.py - TXT and PDF extraction.
+- src/agentic_site_factory/models.py - Pydantic data models.
+- src/agentic_site_factory/quality.py - Deterministic quality checks.
+- src/agentic_site_factory/retrieval.py - TF-IDF retrieval.
+- src/agentic_site_factory/site_builder.py - Static HTML renderer.
+- data/sample_manuscripts/ - Synthetic sample content.
+- generated_sites/ - Generated website output.
+- tests/ - Unit tests.
+- docs/PORTFOLIO_OVERVIEW.md - Portfolio explanation.
 
 ## Local Setup
 
@@ -30,7 +53,31 @@ Run the following commands from the repository root.
     pip install -e ".[dev]"
     pytest
     ruff check .
+    streamlit run app/Home.py
+
+## Optional OpenAI Usage
+
+Set these environment variables before running Streamlit.
+
+    export OPENAI_API_KEY="your-key-here"
+    export OPENAI_MODEL="gpt-4o-mini"
+
+Without an API key, deterministic local fallback mode remains fully functional.
+
+## Generated Output
+
+After clicking Build Website in the app, the generated artifact bundle is saved to:
+
+    generated_sites/latest
+
+The bundle contains:
+
+- index.html
+- site_plan.json
+- evidence_map.json
+- quality_report.json
+- artifact_manifest.json
 
 ## Portfolio Disclosure
 
-This repository uses synthetic sample content for demonstration purposes.
+This repository uses synthetic sample content for demonstration purposes. Uploaded local files remain part of the local app session and are not committed by default.
