@@ -37,3 +37,6 @@ The app exposes generated sites through URLs like:
 
 These generated runtime files are useful during the active app session. They are not intended as permanent storage.
 
+
+
+- Generated websites are multi-page static artifacts with index.html plus one HTML file per generated section.

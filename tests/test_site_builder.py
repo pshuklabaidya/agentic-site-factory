@@ -23,14 +23,14 @@ def test_build_html_contains_author_name():
     assert site.theme.name
 
 
-def test_build_html_nav_uses_in_page_scroll_handler():
+def test_build_html_nav_uses_real_page_links():
     spec = SiteSpec(author_name="Demo Author")
     sections = [GeneratedSection(name="books", heading="<Books>", body="Book list.")]
 
     site = build_html(spec, sections)
 
-    assert "data-target=\"books\"" in site.html
-    assert "scrollIntoView" in site.html
+    assert 'href="books.html"' in site.html
+    assert "books.html" in site.pages
     assert "<Books>" not in site.html
 
 
@@ -51,12 +51,17 @@ def test_build_html_sanitizes_visible_body_text():
     assert "&lt;strong&gt;" not in site.html
 
 
-def test_save_site_writes_index_html(tmp_path: Path):
+def test_save_site_writes_index_html_and_section_pages(tmp_path: Path):
     spec = SiteSpec(author_name="Demo Author")
-    sections = [GeneratedSection(name="bio", heading="About", body="Author biography.")]
+    sections = [
+        GeneratedSection(name="bio", heading="About", body="Author biography."),
+        GeneratedSection(name="books", heading="Books", body="Book list."),
+    ]
     site = build_html(spec, sections)
 
     output_path = save_site(site, tmp_path)
 
     assert output_path.name == "index.html"
     assert output_path.exists()
+    assert (tmp_path / "bio.html").exists()
+    assert (tmp_path / "books.html").exists()

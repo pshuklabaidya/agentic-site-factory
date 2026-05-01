@@ -37,14 +37,19 @@ def save_artifact_bundle(
 ) -> ArtifactManifest:
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    index_path = output_dir / "index.html"
+    pages = site.pages or {"index.html": site.html}
+    page_files: list[str] = []
+
+    for filename, html in pages.items():
+        page_path = output_dir / filename
+        page_path.write_text(html, encoding="utf-8")
+        page_files.append(filename)
+
     plan_path = output_dir / "site_plan.json"
     evidence_path = output_dir / "evidence_map.json"
     quality_path = output_dir / "quality_report.json"
     theme_path = output_dir / "theme_spec.json"
     manifest_path = output_dir / "artifact_manifest.json"
-
-    index_path.write_text(site.html, encoding="utf-8")
 
     write_json(plan_path, plan.model_dump())
     write_json(
@@ -69,14 +74,16 @@ def save_artifact_bundle(
         inferred_theme_rationale=site.theme.rationale,
         evidence_sources=evidence_sources,
         quality_passed=quality_report.passed,
-        files=[
-            index_path.name,
-            plan_path.name,
-            evidence_path.name,
-            quality_path.name,
-            theme_path.name,
-            manifest_path.name,
-        ],
+        files=sorted(
+            page_files
+            + [
+                plan_path.name,
+                evidence_path.name,
+                quality_path.name,
+                theme_path.name,
+                manifest_path.name,
+            ]
+        ),
     )
 
     write_json(manifest_path, manifest.model_dump())

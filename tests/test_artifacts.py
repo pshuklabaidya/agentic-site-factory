@@ -13,9 +13,10 @@ def test_save_artifact_bundle_writes_expected_files(tmp_path):
         content_strategy="Use evidence.",
         agent_steps=["Plan", "Build"],
     )
+    html = "<!doctype html><header></header><main></main><script>addToCart(); cart-count</script></html>"
     site = GeneratedSite(
         title="Demo Site",
-        html="<!doctype html><header></header><main></main><script>addToCart(); cart-count</script></html>",
+        html=html,
         sections=[
             GeneratedSection(
                 name="hero",
@@ -25,6 +26,7 @@ def test_save_artifact_bundle_writes_expected_files(tmp_path):
             )
         ],
         theme=theme,
+        pages={"index.html": html, "hero.html": html},
     )
     passages = [RetrievedPassage(source="source.txt", text="Evidence", score=1.0)]
     quality_report = evaluate_site(spec, site, passages)
@@ -40,8 +42,10 @@ def test_save_artifact_bundle_writes_expected_files(tmp_path):
 
     assert manifest.quality_passed
     assert (tmp_path / "index.html").exists()
+    assert (tmp_path / "hero.html").exists()
     assert (tmp_path / "site_plan.json").exists()
     assert (tmp_path / "evidence_map.json").exists()
     assert (tmp_path / "quality_report.json").exists()
     assert (tmp_path / "theme_spec.json").exists()
     assert (tmp_path / "artifact_manifest.json").exists()
+    assert "hero.html" in manifest.files

@@ -74,3 +74,6 @@ The Streamlit app uses OpenAI generation when `OPENAI_API_KEY` is available. Rep
 
 
 - Streamlit static serving is enabled so generated sites open as real separate-tab pages under `/app/static/...`.
+
+
+- Generated websites are multi-page static artifacts with index.html plus one HTML file per generated section.

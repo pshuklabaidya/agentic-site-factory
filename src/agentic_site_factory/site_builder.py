@@ -19,6 +19,10 @@ def clean_section_id(value: str) -> str:
     return cleaned or "section"
 
 
+def section_filename(section: GeneratedSection) -> str:
+    return f"{clean_section_id(section.name)}.html"
+
+
 def source_note(section: GeneratedSection) -> str:
     if not section.evidence_sources:
         return ""
@@ -78,43 +82,56 @@ def render_section(section: GeneratedSection) -> str:
     """
 
 
-def build_html(
-    spec: SiteSpec,
-    sections: list[GeneratedSection],
-    theme: ThemeSpec | None = None,
-) -> GeneratedSite:
-    title = f"{sanitize_heading(spec.author_name, fallback='Demo Author')} - Official Author Site"
-    resolved_theme = theme or infer_custom_theme(spec, documents=[], passages=[])
-    rendered_sections = "\n".join(render_section(section) for section in sections)
-
-    nav_links = "".join(
-        (
-            f'<a href="#{escape(clean_section_id(section.name))}" '
-            f'data-target="{escape(clean_section_id(section.name))}">'
-            f"{escape(clean_heading(section.heading))}</a>"
-        )
+def render_home_intro(spec: SiteSpec, sections: list[GeneratedSection]) -> str:
+    section_cards = "\n".join(
+        f"""
+        <a class="page-card" href="{escape(section_filename(section))}">
+          <span>{escape(sanitize_body(section.name.title()))}</span>
+          <strong>{escape(clean_heading(section.heading))}</strong>
+          <small>{escape(sanitize_body(section.body)[:150])}</small>
+        </a>
+        """
         for section in sections
     )
 
-    author_name = sanitize_heading(spec.author_name, fallback="Demo Author")
-    website_goal = sanitize_body(spec.website_goal)
+    return f"""
+    <section class="section home-overview">
+      <div class="section-label">Website Builder Output</div>
+      <h2>Generated Multi-Page Website</h2>
+      <p>{escape(sanitize_body(spec.website_goal))}</p>
+      <div class="page-grid">
+        {section_cards}
+      </div>
+    </section>
+    """
 
-    html = f"""<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{escape(title)}</title>
-  <style>
+
+def render_nav(sections: list[GeneratedSection], current_page: str) -> str:
+    home_class = "active" if current_page == "index.html" else ""
+    links = [f'<a class="{home_class}" href="index.html">Home</a>']
+
+    for section in sections:
+        filename = section_filename(section)
+        active_class = "active" if filename == current_page else ""
+        links.append(
+            f'<a class="{active_class}" href="{escape(filename)}">'
+            f"{escape(clean_heading(section.heading))}</a>"
+        )
+
+    return "\n".join(links)
+
+
+def page_css(theme: ThemeSpec) -> str:
+    return f"""
     :root {{
-      --bg: {resolved_theme.background};
-      --ink: {resolved_theme.ink};
-      --muted: {resolved_theme.muted};
-      --card: {resolved_theme.card};
-      --accent: {resolved_theme.accent};
-      --accent-soft: {resolved_theme.accent_soft};
-      --border: {resolved_theme.border};
-      --cover-gradient: {resolved_theme.cover_gradient};
+      --bg: {theme.background};
+      --ink: {theme.ink};
+      --muted: {theme.muted};
+      --card: {theme.card};
+      --accent: {theme.accent};
+      --accent-soft: {theme.accent_soft};
+      --border: {theme.border};
+      --cover-gradient: {theme.cover_gradient};
     }}
     * {{
       box-sizing: border-box;
@@ -124,7 +141,7 @@ def build_html(
     }}
     body {{
       margin: 0;
-      font-family: {resolved_theme.font_family};
+      font-family: {theme.font_family};
       color: var(--ink);
       background: var(--bg);
       line-height: 1.6;
@@ -164,6 +181,12 @@ def build_html(
       text-decoration: none;
       font-weight: 700;
       cursor: pointer;
+      border-bottom: 2px solid transparent;
+      padding-bottom: 2px;
+    }}
+    nav a.active {{
+      color: var(--accent);
+      border-bottom-color: var(--accent);
     }}
     main {{
       width: min(1040px, calc(100% - 32px));
@@ -198,11 +221,40 @@ def build_html(
       margin-top: 24px;
       padding-top: 14px;
     }}
+    .page-grid,
     .shop-grid {{
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 20px;
       margin-top: 24px;
+    }}
+    .page-card {{
+      display: block;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      background: var(--bg);
+      color: var(--ink);
+      text-decoration: none;
+      min-height: 170px;
+    }}
+    .page-card span {{
+      color: var(--accent);
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }}
+    .page-card strong {{
+      display: block;
+      font-size: 1.2rem;
+      margin-bottom: 12px;
+    }}
+    .page-card small {{
+      color: var(--muted);
+      font-size: 0.95rem;
     }}
     .book-card {{
       border: 1px solid var(--border);
@@ -241,6 +293,28 @@ def build_html(
       color: var(--muted);
       padding: 36px 24px;
     }}
+    """
+
+
+def render_page(
+    spec: SiteSpec,
+    sections: list[GeneratedSection],
+    theme: ThemeSpec,
+    current_page: str,
+    main_content: str,
+    page_title: str,
+) -> str:
+    author_name = sanitize_heading(spec.author_name, fallback="Demo Author")
+    website_goal = sanitize_body(spec.website_goal)
+
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{escape(page_title)}</title>
+  <style>
+    {page_css(theme)}
   </style>
 </head>
 <body>
@@ -249,41 +323,89 @@ def build_html(
     <p>{escape(website_goal)}</p>
   </header>
   <nav>
-    {nav_links}
+    {render_nav(sections, current_page)}
   </nav>
   <main>
-    {rendered_sections}
+    {main_content}
   </main>
   <footer>
-    Generated by Agentic Site Factory. Visual style: {escape(sanitize_body(resolved_theme.name))}.
+    Generated by Agentic Site Factory. Visual style: {escape(sanitize_body(theme.name))}.
   </footer>
   <script>
     let cartCount = 0;
 
     function addToCart(itemName) {{
       cartCount += 1;
-      document.getElementById('cart-count').textContent = cartCount;
+      const cartCountElement = document.getElementById('cart-count');
+      if (cartCountElement) {{
+        cartCountElement.textContent = cartCount;
+      }}
     }}
-
-    document.querySelectorAll("nav a[data-target]").forEach((link) => {{
-      link.addEventListener("click", (event) => {{
-        event.preventDefault();
-        const target = document.getElementById(link.dataset.target);
-        if (target) {{
-          target.scrollIntoView({{ behavior: "smooth", block: "start" }});
-        }}
-      }});
-    }});
   </script>
 </body>
 </html>
 """
 
-    return GeneratedSite(title=title, html=html, sections=sections, theme=resolved_theme)
+
+def build_pages(
+    spec: SiteSpec,
+    sections: list[GeneratedSection],
+    theme: ThemeSpec,
+) -> dict[str, str]:
+    title = f"{sanitize_heading(spec.author_name, fallback='Demo Author')} - Official Author Site"
+    all_sections = "\n".join(render_section(section) for section in sections)
+    home_content = render_home_intro(spec, sections) + "\n" + all_sections
+
+    pages = {
+        "index.html": render_page(
+            spec=spec,
+            sections=sections,
+            theme=theme,
+            current_page="index.html",
+            main_content=home_content,
+            page_title=title,
+        )
+    }
+
+    for section in sections:
+        filename = section_filename(section)
+        pages[filename] = render_page(
+            spec=spec,
+            sections=sections,
+            theme=theme,
+            current_page=filename,
+            main_content=render_section(section),
+            page_title=f"{clean_heading(section.heading)} - {title}",
+        )
+
+    return pages
+
+
+def build_html(
+    spec: SiteSpec,
+    sections: list[GeneratedSection],
+    theme: ThemeSpec | None = None,
+) -> GeneratedSite:
+    title = f"{sanitize_heading(spec.author_name, fallback='Demo Author')} - Official Author Site"
+    resolved_theme = theme or infer_custom_theme(spec, documents=[], passages=[])
+    pages = build_pages(spec, sections, resolved_theme)
+    html = pages["index.html"]
+
+    return GeneratedSite(
+        title=title,
+        html=html,
+        sections=sections,
+        theme=resolved_theme,
+        pages=pages,
+    )
 
 
 def save_site(site: GeneratedSite, output_dir: Path) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
-    output_path = output_dir / "index.html"
-    output_path.write_text(site.html, encoding="utf-8")
-    return output_path
+    pages = site.pages or {"index.html": site.html}
+
+    for filename, html in pages.items():
+        output_path = output_dir / filename
+        output_path.write_text(html, encoding="utf-8")
+
+    return output_dir / "index.html"

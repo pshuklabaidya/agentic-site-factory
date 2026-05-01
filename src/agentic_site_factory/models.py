@@ -61,3 +61,4 @@ class GeneratedSite(BaseModel):
     html: str
     sections: list[GeneratedSection]
     theme: ThemeSpec
+    pages: dict[str, str] = Field(default_factory=dict)

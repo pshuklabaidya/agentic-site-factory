@@ -13,8 +13,9 @@ from agentic_site_factory.pipeline import run_generation_pipeline
 from agentic_site_factory.retrieval import retrieve_passages
 from agentic_site_factory.static_publish import (
     create_static_site_link,
-    generated_site_index_path,
+    generated_site_page_path,
     publish_static_site,
+    rewrite_generated_site_links_for_viewer,
 )
 from agentic_site_factory.theming import infer_custom_theme
 
@@ -29,17 +30,22 @@ st.set_page_config(
 )
 
 
-def get_query_param(name: str) -> str:
-    value = st.query_params.get(name, "")
+def get_query_param(name: str, default: str = "") -> str:
+    value = st.query_params.get(name, default)
     if isinstance(value, list):
-        return value[0] if value else ""
+        return value[0] if value else default
     return str(value)
 
 
 generated_site_slug = get_query_param("generated_site")
+generated_site_page = get_query_param("page", "index")
 
 if generated_site_slug:
-    site_path = generated_site_index_path(STATIC_ROOT, generated_site_slug)
+    site_path = generated_site_page_path(
+        STATIC_ROOT,
+        generated_site_slug,
+        generated_site_page,
+    )
 
     if site_path.exists():
         st.markdown(
@@ -59,9 +65,11 @@ if generated_site_slug:
             """,
             unsafe_allow_html=True,
         )
-        components.html(site_path.read_text(encoding="utf-8"), height=1200, scrolling=True)
+        page_html = site_path.read_text(encoding="utf-8")
+        page_html = rewrite_generated_site_links_for_viewer(page_html, generated_site_slug)
+        components.html(page_html, height=1200, scrolling=True)
     else:
-        st.error("Generated site not found. Return to the builder and generate the site again.")
+        st.error("Generated site page not found. Return to the builder and generate the site again.")
 
     st.stop()
 
@@ -220,6 +228,7 @@ with right:
             file_name="agentic_site_factory_bundle.zip",
             mime="application/zip",
         )
-        components.html(result.site.html, height=760, scrolling=True)
+        preview_html = rewrite_generated_site_links_for_viewer(result.site.html, site_slug)
+        components.html(preview_html, height=760, scrolling=True)
     else:
         st.write("Click Build Website to generate the static site.")

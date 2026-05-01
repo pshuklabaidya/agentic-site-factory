@@ -27,6 +27,8 @@ The project demonstrates how an agentic workflow can transform source documents 
 
 ## Features
 
+- Generated websites are multi-page static artifacts with index.html plus one HTML file per generated section.
+
 - Streamlit static serving is enabled so generated sites open as real separate-tab pages under `/app/static/...`.
 
 - Generated sites are published to Streamlit static files and opened as real separate-tab pages.
