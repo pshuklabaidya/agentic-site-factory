@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 import shutil
+from html import escape
 from pathlib import Path
 
 
@@ -25,16 +26,25 @@ def publish_static_site(
     destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(source_dir, destination)
 
-    return destination, f"/app/static/generated_sites/{site_slug}/index.html"
+    return destination, site_slug
+
+
+def generated_site_viewer_url(site_slug: str) -> str:
+    return f"?generated_site={site_slug}"
+
+
+def generated_site_index_path(static_root: Path, site_slug: str) -> Path:
+    return static_root / "generated_sites" / slugify(site_slug) / "index.html"
 
 
 def create_static_site_link(
-    site_url: str,
+    site_slug: str,
     label: str = "Open generated website in new tab",
 ) -> str:
+    href = generated_site_viewer_url(site_slug)
     return (
-        f'<a href="{site_url}" target="_blank" rel="noopener noreferrer" '
+        f'<a href="{escape(href)}" target="_blank" rel="noopener noreferrer" '
         'style="display:inline-block;padding:0.75rem 1rem;border-radius:999px;'
         'background:#6d28d9;color:white;font-weight:700;text-decoration:none;">'
-        f"{label}</a>"
+        f"{escape(label)}</a>"
     )

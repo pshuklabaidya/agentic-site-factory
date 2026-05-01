@@ -10,18 +10,61 @@ from agentic_site_factory.bundle import create_zip_archive
 from agentic_site_factory.ingestion import extract_uploaded_document, load_local_text_documents
 from agentic_site_factory.models import SiteSpec, SourceDocument
 from agentic_site_factory.pipeline import run_generation_pipeline
-from agentic_site_factory.static_publish import create_static_site_link, publish_static_site
 from agentic_site_factory.retrieval import retrieve_passages
+from agentic_site_factory.static_publish import (
+    create_static_site_link,
+    generated_site_index_path,
+    publish_static_site,
+)
 from agentic_site_factory.theming import infer_custom_theme
 
 
 ROOT = Path(__file__).resolve().parents[1]
+STATIC_ROOT = ROOT / "app" / "static"
 
 st.set_page_config(
     page_title="Agentic Site Factory",
     page_icon=":building_construction:",
     layout="wide",
 )
+
+
+def get_query_param(name: str) -> str:
+    value = st.query_params.get(name, "")
+    if isinstance(value, list):
+        return value[0] if value else ""
+    return str(value)
+
+
+generated_site_slug = get_query_param("generated_site")
+
+if generated_site_slug:
+    site_path = generated_site_index_path(STATIC_ROOT, generated_site_slug)
+
+    if site_path.exists():
+        st.markdown(
+            """
+            <style>
+              [data-testid="stHeader"],
+              [data-testid="stToolbar"],
+              [data-testid="stSidebar"],
+              footer {
+                display: none !important;
+              }
+              .block-container {
+                padding: 0 !important;
+                max-width: 100% !important;
+              }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+        components.html(site_path.read_text(encoding="utf-8"), height=1200, scrolling=True)
+    else:
+        st.error("Generated site not found. Return to the builder and generate the site again.")
+
+    st.stop()
+
 
 st.title("Agentic Site Factory")
 st.caption("Agentic RAG website builder for authors, creators, and small businesses.")
@@ -142,6 +185,12 @@ with right:
         )
         create_zip_archive(output_dir, zip_path)
 
+        static_dir, site_slug = publish_static_site(
+            source_dir=output_dir,
+            static_root=STATIC_ROOT,
+            site_name=spec.author_name,
+        )
+
         st.success(f"Website generated in {output_dir}")
         st.write(f"**Inferred visual style:** {result.site.theme.name}")
         st.write(f"**Style rationale:** {result.site.theme.rationale}")
@@ -150,21 +199,9 @@ with right:
         if result.manifest is not None:
             st.write(f"**Artifact files:** {', '.join(result.manifest.files)}")
 
-        static_dir, site_url = publish_static_site(
-            source_dir=output_dir,
-            static_root=ROOT / "app" / "static",
-            site_name=spec.author_name,
-        )
-        st.markdown(create_static_site_link(site_url), unsafe_allow_html=True)
-        st.write(f"**Static preview path:** {static_dir}")
-
-        static_dir, site_url = publish_static_site(
-            source_dir=output_dir,
-            static_root=ROOT / "app" / "static",
-            site_name=spec.author_name,
-        )
-        st.link_button("Open generated website in new tab", site_url)
-        st.write(f"**Static preview path:** {static_dir}")
+        st.markdown(create_static_site_link(site_slug), unsafe_allow_html=True)
+        st.write(f"**Generated site viewer slug:** {site_slug}")
+        st.write(f"**Generated site file path:** {static_dir}")
 
         with st.expander("Quality Report"):
             for check in result.quality_report.checks:
