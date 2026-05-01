@@ -11,6 +11,7 @@ src/agentic_site_factory/pipeline.py
 src/agentic_site_factory/quality.py
 src/agentic_site_factory/retrieval.py
 src/agentic_site_factory/site_builder.py
+src/agentic_site_factory/spec_generation.py
 src/agentic_site_factory.egg-info/PKG-INFO
 src/agentic_site_factory.egg-info/SOURCES.txt
 src/agentic_site_factory.egg-info/dependency_links.txt
