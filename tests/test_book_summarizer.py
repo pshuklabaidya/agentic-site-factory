@@ -1,7 +1,7 @@
 from agentic_site_factory.book_summarizer import summarize_book_text
 
 
-def test_summarize_book_text_uses_more_than_front_sentence():
+def test_summarize_book_text_uses_full_document_signals():
     text = (
         "Elena returns to the coast after her father's death. "
         "She discovers letters hidden in the attic. "
