@@ -4,6 +4,8 @@ pyproject.toml
 src/agentic_site_factory/__init__.py
 src/agentic_site_factory/agents.py
 src/agentic_site_factory/artifacts.py
+src/agentic_site_factory/book_catalog.py
+src/agentic_site_factory/book_summarizer.py
 src/agentic_site_factory/bundle.py
 src/agentic_site_factory/ingestion.py
 src/agentic_site_factory/models.py
@@ -23,9 +25,12 @@ src/agentic_site_factory.egg-info/dependency_links.txt
 src/agentic_site_factory.egg-info/requires.txt
 src/agentic_site_factory.egg-info/top_level.txt
 tests/test_artifacts.py
+tests/test_book_catalog.py
+tests/test_book_summarizer.py
 tests/test_bundle.py
 tests/test_generate_from_spec.py
 tests/test_ingestion.py
+tests/test_multipage_site.py
 tests/test_pipeline.py
 tests/test_preview_links.py
 tests/test_quality.py
@@ -34,7 +39,9 @@ tests/test_settings.py
 tests/test_site_builder.py
 tests/test_static_publish.py
 tests/test_streamlit_config.py
+tests/test_streamlit_viewer.py
 tests/test_template.py
 tests/test_text_sanitizer.py
 tests/test_themes.py
 tests/test_theming.py
+tests/test_visual_customization.py

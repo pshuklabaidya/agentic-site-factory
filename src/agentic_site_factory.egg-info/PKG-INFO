@@ -5,7 +5,7 @@ Summary: Agentic RAG website builder that turns manuscripts and specifications i
 Requires-Python: >=3.11
 Description-Content-Type: text/markdown
 License-File: LICENSE
-Requires-Dist: streamlit>=1.34.0
+Requires-Dist: streamlit>=1.56.0
 Requires-Dist: scikit-learn>=1.4.0
 Requires-Dist: pydantic>=2.7.0
 Requires-Dist: python-dotenv>=1.0.1
@@ -44,6 +44,14 @@ The project demonstrates how an agentic workflow can transform source documents 
 7. Artifact agent saves the generated site package.
 
 ## Features
+
+- The demo cart uses browser localStorage so cart contents persist across generated pages and browser sessions.
+
+- Each detected book gets its own generated book page with an Add to Cart action.
+
+- The Books page lists uploaded documents classified as books, with brief summaries.
+
+- Generated websites are multi-page static artifacts with index.html plus one HTML file per generated section.
 
 - Streamlit static serving is enabled so generated sites open as real separate-tab pages under `/app/static/...`.
 
